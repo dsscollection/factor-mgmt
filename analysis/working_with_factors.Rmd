@@ -2,7 +2,7 @@
 title: "Working with factor variables in R"
 author: "Amelia McNamara"
 date: "June 7, 2016"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -31,7 +31,7 @@ str(GSS)
 
 Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if `SEX == 1` indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the `readxl` package to load it. 
 
-```{r}
+```{r, warning=FALSE}
 library(readxl)
 GSS <- read_excel("../data/GSS.xls")
 str(GSS)
@@ -44,7 +44,7 @@ That's a little better. Now we have preserved the character strings. But, the da
 
 One problem is that the variable names (while human readable) are full of spaces, so are hard to use. But, we can rename them. The `rename()` function in the `dplyr` package is a good way to do this. 
 
-```{r}
+```{r, message=FALSE}
 library(dplyr)
 
 GSS <- GSS %>% 
