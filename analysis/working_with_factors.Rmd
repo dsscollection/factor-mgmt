@@ -48,16 +48,20 @@ One problem is that the variable names (while human readable) are full of spaces
 library(dplyr)
 
 GSS <- GSS %>% 
-  rename(LaborStatus = `Labor force status`)
+  rename(LaborStatus = `Labor force status`) %>%
+  rename(PolParty = `Political party affiliation`) %>%
+  rename(Age = `Age of respondent`)
 ```
 
 ## Considering some factor variables
 Once we have variable names that are easier to work with, we can begin to think about how the data should be cleaned. 
 ```{r}
 GSS <- GSS %>%
-  mutate(LaborStatus = factor(LaborStatus))
+  mutate(LaborStatus = factor(LaborStatus)) %>%
+  mutate(PolParty = factor(PolParty))
 
 levels(GSS$LaborStatus) # I wish I had a piece of dplyr code for this
+levels(GSS$PolParty)
 ```
 
 
@@ -70,9 +74,18 @@ Here is how I do that in base R. Typically, I end up ruining something in the pr
 ```{r}
 summary(GSS$LaborStatus)
 ```
+
 ```{r}
 levels(GSS$LaborStatus) <- c(levels(GSS$LaborStatus)[1:5], "Temporarily not working", "Unemployed, laid off", "Working full time", "Working part time")
 summary(GSS$LaborStatus)
+```
+
+What is the dplyr equivalent? Seems like `recode` or `recode_factor` but there are both giving me errors because of `tbl_df`.
+
+```{r, eval=FALSE}
+GSS %>% 
+  select(PolParty) %>%
+  recode_factor(`Not str republication` = "Not a strong republican")
 ```
 
 ## Combining several levels into one
@@ -88,11 +101,28 @@ summary(GSS$LaborStatus)
 In this data, age is provided as an integer for respondents 18-88, but then also includes the possible answer "89 or older" as well as a possible "No answer" and NA values. 
 ```{r}
 GSS <- GSS %>%
-  mutate(`Age of respondent` = factor(`Age of respondent`))
-summary(GSS$`Age of respondent`)
+  mutate(Age = factor(Age))
+summary(GSS$Age)
 ```
 
 We might want to turn this into a factor variable with two levels: 18-65, and over 65. In this case, it would be much easier to deal with a conditional statement about the numeric values, rather than writing out each of the numbers as a character vector.  
+
+But, in order to do that we need to make it numeric. 
+```{r}
+# GSS$Age[GSS$Age == "No answer"] <- NA # Do I really need this? Nope!
+levels(GSS$Age) <- c(levels(GSS$Age)[1:71], "89", "No answer")
+GSS$Age <- as.numeric(as.character(GSS$Age))
+summary(GSS$Age)
+```
+
+Of course, we're cheating a little bit here-- if we were going to use this as a numeric variable in an analysis, we wouldn't necessarily want to turn all the "89 or older" cases into the number "89". But, we're just on our way to a two-category factor, so those cases would have gone to the "65 and up" category one way or the other.
+
+```{r}
+GSS <- GSS %>%
+  mutate(Age = if_else(Age<65, "18-65", "65 and up")) %>%
+  mutate(Age = factor(Age))
+summary(GSS$Age)
+```
 
 ## Acknowledgements
 
