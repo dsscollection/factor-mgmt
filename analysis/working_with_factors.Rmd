@@ -103,6 +103,13 @@ levels(GSS$LaborStatus) <- c("Not employed", "No answer", "Other", "Not employed
 summary(GSS$LaborStatus)
 ```
 
+## mosaic combining levels
+
+```{r}
+Births78 <- Births78 %>%
+  mutate(weekend = derivedFactor(weekend = wday== "Sun" | wday == "Sat", .default="weekday"))
+```
+
 ## Combining many categories into one
 In this data, age is provided as an integer for respondents 18-88, but then also includes the possible answer "89 or older" as well as a possible "No answer" and NA values. 
 ```{r}
