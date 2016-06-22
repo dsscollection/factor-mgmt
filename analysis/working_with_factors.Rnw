@@ -1,0 +1,180 @@
+\documentclass[fleqn,10pt,lineno]{wlpeerj}
+
+
+\let\proglang=\textsf
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\def\newblock{\hskip .11em plus .33em minus .07em}
+
+
+\title{Wrangling categorical data in R}
+
+\author[1]{Amelia McNamara}
+\affil[1]{Smith College}
+
+
+\keywords{}
+
+\begin{abstract}
+Working with categorical data in R (known as factor variables) can be particularly tricky. This paper presents a few approaches to wrangling this type of data, using the base R package as well as dplyr and mosaic. 
+\end{abstract}
+
+\begin{document}
+
+<<setup, include=FALSE>>=
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, size='footnotesize')
+@
+
+\flushbottom
+\maketitle
+\thispagestyle{empty}
+
+\section*{Introduction}
+
+
+
+Factors are the data type that R uses for categorical data. For example, a gender variable might include the categories \verb#male#, \verb#female# and \verb#gender non-conforming#. Storing this information as a factor is the alternative to storing it as a series of character strings. 
+
+Historically, storing categorical data as a factor variable was more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015}. However, R has changed to use hashed versions of all character strings, so the storage issue is no longer valid~\citep{Pen2015}. 
+
+Factors can be very tricky to deal with, which has led to the online \verb#stringsAsFactors = HELLNO# movement. This refers to the default behavior of many of R's data import functions to take any variable composed as strings and automatically convert the variable to a factor. The R community has been moving away from this default behavior, with functions from Hadley Wickham's \pkg{readr} package defaulting to leaving strings as-is. 
+
+However, factor variables are important when it comes to modeling. When you pass a factor variable into \pkg{lm} or \pkg{glm}, \proglang{R} automatically creates dummy variables for each of the levels and picks one as a reference group. This behavior is lost if the variable is stored as a character vector.  
+
+So, factors are important. But, they can often be hard to deal with. Because of the way the group numbers are stored separately from the factor labels, it can be easy to overwrite data in such a way that the original data is lost. In this paper, we will consider the best practices for working with factor data. 
+
+To do this, we will consider data from the General Social Survey. 
+
+
+\section*{Loading the data}
+
+We have several options for how to get this data. We could download it in SPSS or Stata formats and use the foreign package to read it in. The GSS download even provides an R file to do the translation for you. Here is the result of that:
+
+<<>>=
+source('../data/GSS.r')
+str(GSS)
+@
+
+Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
+
+<<warning=FALSE>>=
+library(readxl)
+GSS <- read_excel("../data/GSS.xls")
+str(GSS)
+GSS <- GSS[,-14]
+@
+
+That's a little better. Now we have preserved the character strings. But, the data is not yet useable in an analysis. 
+
+\section*{Renaming the variables}
+
+One problem is that the variable names (while human readable) are full of spaces, so are hard to use. But, we can rename them. The \verb#rename()# function in the \pkg{dplyr} package is a good way to do this. 
+
+<<>>=
+library(dplyr)
+
+GSS <- GSS %>% 
+  rename(LaborStatus = `Labor force status`) %>%
+  rename(PolParty = `Political party affiliation`) %>%
+  rename(Age = `Age of respondent`)
+@
+
+\section*{Considering some factor variables}
+Once we have variable names that are easier to work with, we can begin to think about how the data should be cleaned. 
+<<>>=
+GSS <- GSS %>%
+  mutate(LaborStatus = factor(LaborStatus)) %>%
+  mutate(PolParty = factor(PolParty))
+
+levels(GSS$LaborStatus) # I wish I had a piece of dplyr code for this
+levels(GSS$PolParty)
+@
+
+
+\section*{Changing the labels of factors (base R)}
+
+One action you might want to take is just to change the text of one (or more) of the factor labels, so it appears more nicely formatted in a \pkg{ggplot2} plot, for example.
+
+Here is how I do that in base R. Typically, I end up ruining something in the process of doing this, so I *always* start with a summary call, to check after I have done my attempt. 
+
+<<>>=
+summary(GSS$LaborStatus)
+@
+
+<<>>=
+levels(GSS$LaborStatus) <- c(levels(GSS$LaborStatus)[1:5], 
+                             "Temporarily not working", 
+                             "Unemployed, laid off", 
+                             "Working full time", 
+                             "Working part time")
+summary(GSS$LaborStatus)
+@
+
+\section*{Changing the labels of factors (dplyr)}
+
+In \pkg{dplyr}, you can use the \verb#recode# function to do the same thing. There are a few things to remember with \verb#recode#. The first is that it is a vector function, which means it must be used within a \verb#mutate# call or with a variable pulled out using \verb#$#. The second is that you need to tell it which variable to recode, even if you are overwriting an existing variable. 
+
+<<>>=
+GSS <- GSS %>% 
+  mutate(PolParty =  recode(PolParty, `Not str republican` = "Not a strong republican"))
+@
+
+\section*{Combining several levels into one}
+This is another common task. Maybe you want fewer coefficients to interpret in your model, or the process that generated the data makes a finer distinction between categories than your research. For whatever the reason, you want to group together levels that are currently separate. 
+
+How I do this in base R:
+<<>>=
+levels(GSS$LaborStatus) <- c("Not employed", "No answer",
+                             "Other", "Not employed", 
+                             "Not employed", "Not employed", 
+                             "Not employed", "Employed", "Employed")
+summary(GSS$LaborStatus)
+@
+
+\section{mosaic combining levels}
+
+<<>>=
+library(mosaic)
+data(Births78)
+Births78 <- Births78 %>%
+  mutate(weekend = derivedFactor(weekend = wday== "Sun" | wday == "Sat", .default="weekday"))
+@
+
+\section*{Combining many categories into one}
+In this data, age is provided as an integer for respondents 18-88, but then also includes the possible answer "89 or older" as well as a possible "No answer" and NA values. 
+<<>>=
+GSS <- GSS %>%
+  mutate(Age = factor(Age))
+summary(GSS$Age)
+@
+
+We might want to turn this into a factor variable with two levels: 18-65, and over 65. In this case, it would be much easier to deal with a conditional statement about the numeric values, rather than writing out each of the numbers as a character vector.  
+
+But, in order to do that we need to make it numeric. 
+<<>>=
+# GSS$Age[GSS$Age == "No answer"] <- NA # Do I really need this? Nope!
+levels(GSS$Age) <- c(levels(GSS$Age)[1:71], "89", "No answer")
+GSS$Age <- as.numeric(as.character(GSS$Age))
+summary(GSS$Age)
+@
+
+Of course, we're cheating a little bit here-- if we were going to use this as a numeric variable in an analysis, we wouldn't necessarily want to turn all the "89 or older" cases into the number "89". But, we're just on our way to a two-category factor, so those cases would have gone to the "65 and up" category one way or the other.
+
+<<>>=
+GSS <- GSS %>%
+  mutate(Age = if_else(Age<65, "18-65", "65 and up")) %>%
+  mutate(Age = factor(Age))
+summary(GSS$Age)
+@
+
+\section*{Acknowledgements}
+
+Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spring 2016 project in my SDS 291 class formed the inspiration for this paper. 
+
+
+
+
+
+
+\bibliography{bibliography.bib}
+
+\end{document}
