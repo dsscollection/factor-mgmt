@@ -1,0 +1,389 @@
+\documentclass[fleqn,10pt,lineno]{wlpeerj}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+
+\let\proglang=\textsf
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\def\newblock{\hskip .11em plus .33em minus .07em}
+
+
+\title{Wrangling categorical data in R}
+
+\author[1]{Amelia McNamara}
+\affil[1]{Smith College}
+
+
+\keywords{}
+
+\begin{abstract}
+Working with categorical data in R (known as factor variables) can be particularly tricky. This paper presents a few approaches to wrangling this type of data, using the base R package as well as dplyr and mosaic. 
+\end{abstract}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+
+\flushbottom
+\maketitle
+\thispagestyle{empty}
+
+\section*{Introduction}
+
+
+
+Factors are the data type that R uses for categorical data. For example, a gender variable might include the categories \verb#male#, \verb#female# and \verb#gender non-conforming#. Storing this information as a factor is the alternative to storing it as a series of character strings. 
+
+Historically, storing categorical data as a factor variable was more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015}. However, R has changed to use hashed versions of all character strings, so the storage issue is no longer valid~\citep{Pen2015}. 
+
+Factors can be very tricky to deal with, which has led to the online \verb#stringsAsFactors = HELLNO# movement. This refers to the default behavior of many of R's data import functions to take any variable composed as strings and automatically convert the variable to a factor. The R community has been moving away from this default behavior, with functions from Hadley Wickham's \pkg{readr} package defaulting to leaving strings as-is. 
+
+However, factor variables are important when it comes to modeling. When you pass a factor variable into \pkg{lm} or \pkg{glm}, \proglang{R} automatically creates dummy variables for each of the levels and picks one as a reference group. This behavior is lost if the variable is stored as a character vector.  
+
+So, factors are important. But, they can often be hard to deal with. Because of the way the group numbers are stored separately from the factor labels, it can be easy to overwrite data in such a way that the original data is lost. In this paper, we will consider the best practices for working with factor data. 
+
+To do this, we will consider data from the General Social Survey. 
+
+
+\section*{Loading the data}
+
+We have several options for how to get this data. We could download it in SPSS or Stata formats and use the foreign package to read it in. The GSS download even provides an R file to do the translation for you. Here is the result of that:
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{source}\hlstd{(}\hlstr{'../data/GSS.r'}\hlstd{)}
+\hlkwd{str}\hlstd{(GSS)}
+\end{alltt}
+\begin{verbatim}
+## 'data.frame':	2538 obs. of  17 variables:
+##  $ YEAR    : int  2014 2014 2014 2014 2014 2014 2014 2014 2014 2014 ...
+##  $ ID_     : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ WRKSTAT : int  1 1 4 2 5 1 9 1 8 1 ...
+##  $ PRESTIGE: int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ MARITAL : int  3 1 3 1 1 1 1 1 5 1 ...
+##  $ CHILDS  : int  0 0 1 2 3 1 2 2 4 3 ...
+##  $ AGE     : int  53 26 59 56 74 56 63 34 37 30 ...
+##  $ EDUC    : int  16 16 13 16 17 17 12 17 10 15 ...
+##  $ SEX     : int  1 2 1 2 2 2 1 1 2 2 ...
+##  $ RACE    : int  1 1 1 1 1 1 1 1 1 3 ...
+##  $ INCOM16 : int  2 3 2 2 4 4 2 3 3 1 ...
+##  $ INCOME  : int  12 12 12 12 13 12 13 12 10 12 ...
+##  $ RINCOME : int  12 12 0 9 0 12 13 12 0 12 ...
+##  $ INCOME72: int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ PARTYID : int  5 5 6 5 3 6 6 8 3 3 ...
+##  $ FINRELA : int  4 4 2 4 3 4 9 3 2 3 ...
+##  $ SEXORNT : int  3 3 3 3 3 9 0 0 3 3 ...
+##  - attr(*, "col.label")= chr  "Gss year for this respondent                       " "Respondent id number" "Labor force status" "Rs occupational prestige score  (1970)" ...
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(readxl)}
+\hlstd{GSS} \hlkwb{<-} \hlkwd{read_excel}\hlstd{(}\hlstr{"../data/GSS.xls"}\hlstd{)}
+\hlkwd{str}\hlstd{(GSS)}
+\end{alltt}
+\begin{verbatim}
+## Classes 'tbl_df', 'tbl' and 'data.frame':	2540 obs. of  17 variables:
+##  $ Gss year for this respondent                       : num  2014 2014 2014 2014 2014 ...
+##  $ Respondent id number                               : num  1 2 3 4 5 6 7 8 9 10 ...
+##  $ Labor force status                                 : chr  "Working fulltime" "Working fulltime" "Unempl, laid off" "Working parttime" ...
+##  $ Rs occupational prestige score  (1970)             : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Marital status                                     : chr  "Divorced" "Married" "Divorced" "Married" ...
+##  $ Number of children                                 : num  0 0 1 2 3 1 2 2 4 3 ...
+##  $ Age of respondent                                  : chr  "53.000000" "26.000000" "59.000000" "56.000000" ...
+##  $ Highest year of school completed                   : num  16 16 13 16 17 17 12 17 10 15 ...
+##  $ Respondents sex                                    : chr  "Male" "Female" "Male" "Female" ...
+##  $ Race of respondent                                 : chr  "White" "White" "White" "White" ...
+##  $ Rs family income when 16 yrs old                   : chr  "Below average" "Average" "Below average" "Below average" ...
+##  $ Total family income                                : chr  "$25000 or more" "$25000 or more" "$25000 or more" "$25000 or more" ...
+##  $ Respondents income                                 : chr  "$25000 or more" "$25000 or more" "Not applicable" "$10000 - 14999" ...
+##  $ Total family income                                : chr  "Not applicable" "Not applicable" "Not applicable" "Not applicable" ...
+##  $ Political party affiliation                        : chr  "Not str republican" "Not str republican" "Strong republican" "Not str republican" ...
+##  $ Opinion of family income                           : chr  "Above average" "Above average" "Below average" "Above average" ...
+##  $ Sexual orientation                                 : chr  "Heterosexual or straight" "Heterosexual or straight" "Heterosexual or straight" "Heterosexual or straight" ...
+\end{verbatim}
+\begin{alltt}
+\hlstd{GSS} \hlkwb{<-} \hlstd{GSS[,}\hlopt{-}\hlnum{14}\hlstd{]}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+That's a little better. Now we have preserved the character strings. But, the data is not yet useable in an analysis. 
+
+\section*{Renaming the variables}
+
+One problem is that the variable names (while human readable) are full of spaces, so are hard to use. But, we can rename them. The \verb#rename()# function in the \pkg{dplyr} package is a good way to do this. 
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(dplyr)}
+
+\hlstd{GSS} \hlkwb{<-} \hlstd{GSS} \hlopt{%>%}
+  \hlkwd{rename}\hlstd{(}\hlkwc{LaborStatus} \hlstd{= `Labor force status`)} \hlopt{%>%}
+  \hlkwd{rename}\hlstd{(}\hlkwc{PolParty} \hlstd{= `Political party affiliation`)} \hlopt{%>%}
+  \hlkwd{rename}\hlstd{(}\hlkwc{Age} \hlstd{= `Age of respondent`)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\section*{Considering some factor variables}
+Once we have variable names that are easier to work with, we can begin to think about how the data should be cleaned. 
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{GSS} \hlkwb{<-} \hlstd{GSS} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{LaborStatus} \hlstd{=} \hlkwd{factor}\hlstd{(LaborStatus))} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{PolParty} \hlstd{=} \hlkwd{factor}\hlstd{(PolParty))}
+
+\hlkwd{levels}\hlstd{(GSS}\hlopt{$}\hlstd{LaborStatus)} \hlcom{# I wish I had a piece of dplyr code for this}
+\end{alltt}
+\begin{verbatim}
+## [1] "Keeping house"    "No answer"        "Other"           
+## [4] "Retired"          "School"           "Temp not working"
+## [7] "Unempl, laid off" "Working fulltime" "Working parttime"
+\end{verbatim}
+\begin{alltt}
+\hlkwd{levels}\hlstd{(GSS}\hlopt{$}\hlstd{PolParty)}
+\end{alltt}
+\begin{verbatim}
+##  [1] "Don't know"         "Ind,near dem"       "Ind,near rep"      
+##  [4] "Independent"        "No answer"          "Not str democrat"  
+##  [7] "Not str republican" "Other party"        "Strong democrat"   
+## [10] "Strong republican"
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+\section*{Changing the labels of factors (base R)}
+
+One action you might want to take is just to change the text of one (or more) of the factor labels, so it appears more nicely formatted in a \pkg{ggplot2} plot, for example.
+
+Here is how I do that in base R. Typically, I end up ruining something in the process of doing this, so I *always* start with a summary call, to check after I have done my attempt. 
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{summary}\hlstd{(GSS}\hlopt{$}\hlstd{LaborStatus)}
+\end{alltt}
+\begin{verbatim}
+##    Keeping house        No answer            Other          Retired 
+##              263                2               76              460 
+##           School Temp not working Unempl, laid off Working fulltime 
+##               90               40              104             1230 
+## Working parttime             NA's 
+##              273                2
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{levels}\hlstd{(GSS}\hlopt{$}\hlstd{LaborStatus)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlkwd{levels}\hlstd{(GSS}\hlopt{$}\hlstd{LaborStatus)[}\hlnum{1}\hlopt{:}\hlnum{5}\hlstd{],}
+                             \hlstr{"Temporarily not working"}\hlstd{,}
+                             \hlstr{"Unemployed, laid off"}\hlstd{,}
+                             \hlstr{"Working full time"}\hlstd{,}
+                             \hlstr{"Working part time"}\hlstd{)}
+\hlkwd{summary}\hlstd{(GSS}\hlopt{$}\hlstd{LaborStatus)}
+\end{alltt}
+\begin{verbatim}
+##           Keeping house               No answer                   Other 
+##                     263                       2                      76 
+##                 Retired                  School Temporarily not working 
+##                     460                      90                      40 
+##    Unemployed, laid off       Working full time       Working part time 
+##                     104                    1230                     273 
+##                    NA's 
+##                       2
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\section*{Changing the labels of factors (dplyr)}
+
+In \pkg{dplyr}, you can use the \verb#recode# function to do the same thing. There are a few things to remember with \verb#recode#. The first is that it is a vector function, which means it must be used within a \verb#mutate# call or with a variable pulled out using \verb#$#. The second is that you need to tell it which variable to recode, even if you are overwriting an existing variable. 
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{GSS} \hlkwb{<-} \hlstd{GSS} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{PolParty} \hlstd{=}  \hlkwd{recode}\hlstd{(PolParty,} \hlkwc{`Not str republican`} \hlstd{=} \hlstr{"Not a strong republican"}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\section*{Combining several levels into one}
+This is another common task. Maybe you want fewer coefficients to interpret in your model, or the process that generated the data makes a finer distinction between categories than your research. For whatever the reason, you want to group together levels that are currently separate. 
+
+How I do this in base R:
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{levels}\hlstd{(GSS}\hlopt{$}\hlstd{LaborStatus)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"Not employed"}\hlstd{,} \hlstr{"No answer"}\hlstd{,}
+                             \hlstr{"Other"}\hlstd{,} \hlstr{"Not employed"}\hlstd{,}
+                             \hlstr{"Not employed"}\hlstd{,} \hlstr{"Not employed"}\hlstd{,}
+                             \hlstr{"Not employed"}\hlstd{,} \hlstr{"Employed"}\hlstd{,} \hlstr{"Employed"}\hlstd{)}
+\hlkwd{summary}\hlstd{(GSS}\hlopt{$}\hlstd{LaborStatus)}
+\end{alltt}
+\begin{verbatim}
+## Not employed    No answer        Other     Employed         NA's 
+##          957            2           76         1503            2
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\section{mosaic combining levels}
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(mosaic)}
+\hlkwd{data}\hlstd{(Births78)}
+\hlstd{Births78} \hlkwb{<-} \hlstd{Births78} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{weekend} \hlstd{=} \hlkwd{derivedFactor}\hlstd{(}\hlkwc{weekend} \hlstd{= wday}\hlopt{==} \hlstr{"Sun"} \hlopt{|} \hlstd{wday} \hlopt{==} \hlstr{"Sat"}\hlstd{,} \hlkwc{.default}\hlstd{=}\hlstr{"weekday"}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\section*{Combining many categories into one}
+In this data, age is provided as an integer for respondents 18-88, but then also includes the possible answer "89 or older" as well as a possible "No answer" and NA values. 
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{GSS} \hlkwb{<-} \hlstd{GSS} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{Age} \hlstd{=} \hlkwd{factor}\hlstd{(Age))}
+\hlkwd{summary}\hlstd{(GSS}\hlopt{$}\hlstd{Age)}
+\end{alltt}
+\begin{verbatim}
+##   18.000000   19.000000   20.000000   21.000000   22.000000   23.000000 
+##           6          25          26          24          28          30 
+##   24.000000   25.000000   26.000000   27.000000   28.000000   29.000000 
+##          31          48          47          41          31          51 
+##   30.000000   31.000000   32.000000   33.000000   34.000000   35.000000 
+##          57          49          55          47          46          40 
+##   36.000000   37.000000   38.000000   39.000000   40.000000   41.000000 
+##          40          54          47          52          46          54 
+##   42.000000   43.000000   44.000000   45.000000   46.000000   47.000000 
+##          35          54          39          41          34          43 
+##   48.000000   49.000000   50.000000   51.000000   52.000000   53.000000 
+##          32          39          54          45          37          60 
+##   54.000000   55.000000   56.000000   57.000000   58.000000   59.000000 
+##          53          52          60          43          60          47 
+##   60.000000   61.000000   62.000000   63.000000   64.000000   65.000000 
+##          46          38          44          42          38          40 
+##   66.000000   67.000000   68.000000   69.000000   70.000000   71.000000 
+##          35          41          21          23          32          28 
+##   72.000000   73.000000   74.000000   75.000000   76.000000   77.000000 
+##          20          22          25          21          24          17 
+##   78.000000   79.000000   80.000000   81.000000   82.000000   83.000000 
+##          28          26          16          14           8          11 
+##   84.000000   85.000000   86.000000   87.000000   88.000000 89 or older 
+##          13           6           9           8          11          19 
+##   No answer        NA's 
+##           9           2
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+We might want to turn this into a factor variable with two levels: 18-65, and over 65. In this case, it would be much easier to deal with a conditional statement about the numeric values, rather than writing out each of the numbers as a character vector.  
+
+But, in order to do that we need to make it numeric. 
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# GSS$Age[GSS$Age == "No answer"] <- NA # Do I really need this? Nope!}
+\hlkwd{levels}\hlstd{(GSS}\hlopt{$}\hlstd{Age)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlkwd{levels}\hlstd{(GSS}\hlopt{$}\hlstd{Age)[}\hlnum{1}\hlopt{:}\hlnum{71}\hlstd{],} \hlstr{"89"}\hlstd{,} \hlstr{"No answer"}\hlstd{)}
+\hlstd{GSS}\hlopt{$}\hlstd{Age} \hlkwb{<-} \hlkwd{as.numeric}\hlstd{(}\hlkwd{as.character}\hlstd{(GSS}\hlopt{$}\hlstd{Age))}
+\hlkwd{summary}\hlstd{(GSS}\hlopt{$}\hlstd{Age)}
+\end{alltt}
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##   18.00   34.00   49.00   49.01   62.00   89.00      11
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Of course, we're cheating a little bit here-- if we were going to use this as a numeric variable in an analysis, we wouldn't necessarily want to turn all the "89 or older" cases into the number "89". But, we're just on our way to a two-category factor, so those cases would have gone to the "65 and up" category one way or the other.
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{GSS} \hlkwb{<-} \hlstd{GSS} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{Age} \hlstd{=} \hlkwd{if_else}\hlstd{(Age}\hlopt{<}\hlnum{65}\hlstd{,} \hlstr{"18-65"}\hlstd{,} \hlstr{"65 and up"}\hlstd{))} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{Age} \hlstd{=} \hlkwd{factor}\hlstd{(Age))}
+\hlkwd{summary}\hlstd{(GSS}\hlopt{$}\hlstd{Age)}
+\end{alltt}
+\begin{verbatim}
+##     18-65 65 and up      NA's 
+##      2011       518        11
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\section*{Acknowledgements}
+
+Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spring 2016 project in my SDS 291 class formed the inspiration for this paper. 
+
+
+
+
+
+
+\bibliography{bibliography.bib}
+
+\end{document}
