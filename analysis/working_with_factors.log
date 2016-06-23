@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  22 JUN 2016 17:05
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  23 JUN 2016 15:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -996,105 +996,104 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [1
 
 {/usr/local/texlive/2012/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (23.11456pt too wide) in paragraph at lines 157--157
+Overfull \hbox (23.11456pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Gss year for this respondent                       : num
   2014 2014 2014 2014 2014 ...[] 
  []
 
 
-Overfull \hbox (3.91455pt too wide) in paragraph at lines 157--157
+Overfull \hbox (3.91455pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Respondent id number                               : num
   1 2 3 4 5 6 7 8 9 10 ...[] 
  []
 
 
-Overfull \hbox (267.91472pt too wide) in paragraph at lines 157--157
+Overfull \hbox (267.91472pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Labor force status                                 : chr
   "Working fulltime" "Working fulltime" "Unempl, laid off" "Working parttime" .
 ..[] 
  []
 
 
-Overfull \hbox (104.71461pt too wide) in paragraph at lines 157--157
+Overfull \hbox (104.71461pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Marital status                                     : chr
   "Divorced" "Married" "Divorced" "Married" ...[] 
  []
 
 
-Overfull \hbox (133.51463pt too wide) in paragraph at lines 157--157
+Overfull \hbox (133.51463pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Age of respondent                                  : chr
   "53.000000" "26.000000" "59.000000" "56.000000" ...[] 
  []
 
 
-Overfull \hbox (47.11458pt too wide) in paragraph at lines 157--157
+Overfull \hbox (47.11458pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Highest year of school completed                   : num
   16 16 13 16 17 17 12 17 10 15 ...[] 
  []
 
 
-Overfull \hbox (56.71458pt too wide) in paragraph at lines 157--157
+Overfull \hbox (56.71458pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Respondents sex                                    : chr
   "Male" "Female" "Male" "Female" ...[] 
  []
 
 
-Overfull \hbox (56.71458pt too wide) in paragraph at lines 157--157
+Overfull \hbox (56.71458pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Race of respondent                                 : chr
   "White" "White" "White" "White" ...[] 
  []
 
 
-Overfull \hbox (181.51466pt too wide) in paragraph at lines 157--157
+Overfull \hbox (181.51466pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Rs family income when 16 yrs old                   : chr
   "Below average" "Average" "Below average" "Below average" ...[] 
  []
 
 
-Overfull \hbox (229.5147pt too wide) in paragraph at lines 157--157
+Overfull \hbox (229.5147pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Total family income                                : chr
   "$25000 or more" "$25000 or more" "$25000 or more" "$25000 or more" ...[] 
  []
 
 
-Overfull \hbox (229.5147pt too wide) in paragraph at lines 157--157
+Overfull \hbox (229.5147pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Respondents income                                 : chr
   "$25000 or more" "$25000 or more" "Not applicable" "$10000 - 14999" ...[] 
  []
 
 
-Overfull \hbox (229.5147pt too wide) in paragraph at lines 157--157
+Overfull \hbox (229.5147pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Total family income                                : chr
   "Not applicable" "Not applicable" "Not applicable" "Not applicable" ...[] 
  []
 
 
-Overfull \hbox (301.51474pt too wide) in paragraph at lines 157--157
+Overfull \hbox (301.51474pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Political party affiliation                        : chr
   "Not str republican" "Not str republican" "Strong republican" "Not str republ
 ican" ...[] 
  []
 
 
-Overfull \hbox (210.31468pt too wide) in paragraph at lines 157--157
+Overfull \hbox (210.31468pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Opinion of family income                           : chr
   "Above average" "Above average" "Below average" "Above average" ...[] 
  []
 
 
-Overfull \hbox (421.51482pt too wide) in paragraph at lines 157--157
+Overfull \hbox (421.51482pt too wide) in paragraph at lines 160--160
 []\OT1/pcr/m/n/8 ##  $ Sexual orientation                                 : chr
   "Heterosexual or straight" "Heterosexual or straight" "Heterosexual or straig
 ht" "Heterosexual or straight" ...[] 
  []
 
-LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <9> not available
-(Font)              Font shape `OT1/phv/b/n' tried instead on input line 183.
-[2]
 LaTeX Font Info:    Font shape `OT1/pcr/m/it' in size <8> not available
-(Font)              Font shape `OT1/pcr/m/sl' tried instead on input line 192.
-
-Overfull \hbox (6.31454pt too wide) in paragraph at lines 265--265
+(Font)              Font shape `OT1/pcr/m/sl' tried instead on input line 163.
+LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <9> not available
+(Font)              Font shape `OT1/phv/b/n' tried instead on input line 187.
+[2]
+Overfull \hbox (6.31454pt too wide) in paragraph at lines 269--269
 []  []\OT1/pcr/b/n/8 mutate[][]\OT1/pcr/m/n/8 ([][]PolParty[] []=[]  []\OT1/pcr
 /b/n/8 recode[][]\OT1/pcr/m/n/8 (PolParty,[] []\TS1/pcr/m/n/8 `\OT1/pcr/m/n/8 N
 ot str republican\TS1/pcr/m/n/8 `[] []\OT1/pcr/m/n/8 =[] []"Not a strong republ
@@ -1102,7 +1101,7 @@ ican"[][]))[][]
  []
 
 [3]
-Overfull \hbox (30.31456pt too wide) in paragraph at lines 298--298
+Overfull \hbox (30.31456pt too wide) in paragraph at lines 302--302
 []  []\OT1/pcr/b/n/8 mutate[][]\OT1/pcr/m/n/8 ([][]weekend[] []=[] []\OT1/pcr/b
 /n/8 derivedFactor[][]\OT1/pcr/m/n/8 ([][]weekend[] []= wday[][]==[] []"Sun"[] 
 []|[] []wday[] []==[] []"Sat"[][],[] [].default[][]=[][]"weekday"[][]))[][] 
@@ -1134,7 +1133,7 @@ Here is how much of TeX's memory you used:
  12020 multiletter control sequences out of 15000+200000
  49553 words of font info for 162 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
- 43i,11n,45p,487b,414s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 43i,12n,45p,487b,400s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/local/texlive/2012/texmf-dist/fonts/enc
 /dvips/base/8r.enc}</usr/local/texlive/2012/texmf-dist/fonts/type1/urw/courier/
 ucrb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/courier/ucrr8a.p
@@ -1143,7 +1142,7 @@ r/local/texlive/2012/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local
 /texlive/2012/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texliv
 e/2012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2012/tex
 mf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on working_with_factors.pdf (5 pages, 94814 bytes).
+Output written on working_with_factors.pdf (5 pages, 97346 bytes).
 PDF statistics:
  49 PDF objects out of 1000 (max. 8388607)
  34 compressed objects within 1 object stream

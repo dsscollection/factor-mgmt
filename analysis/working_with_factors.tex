@@ -126,6 +126,9 @@ We have several options for how to get this data. We could download it in SPSS o
 \end{kframe}
 \end{knitrout}
 
+
+
+
 Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
 
 \begin{knitrout}\footnotesize
@@ -157,6 +160,7 @@ Obviously, this is less than ideal. Now, all the factor variables are encoded as
 \end{verbatim}
 \begin{alltt}
 \hlstd{GSS} \hlkwb{<-} \hlstd{GSS[,}\hlopt{-}\hlnum{14}\hlstd{]}
+\hlcom{#names(ds) <- make.names(names(ds), unique=TRUE)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -375,6 +379,17 @@ Of course, we're cheating a little bit here-- if we were going to use this as a 
 \end{kframe}
 \end{knitrout}
 
+Another way to do this:
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+young <- \hlkwd{as.character}(18:64)
+\hlkwd{derivedVariable}(Age %in% young = \hlstr{"18-65"}, Age )
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
 \section*{Acknowledgements}
 
 Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spring 2016 project in my SDS 291 class formed the inspiration for this paper. 
@@ -382,6 +397,13 @@ Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spr
 
 
 
+\section*{Ideas from Nick}
+Two ways to do each thing (as long as one isn't totally stupid)
+Why is this hard?
+Why is this error-prone?
+Missing values
+A few exercises for summer students
+Appendices for less interesting examples?
 
 
 \bibliography{bibliography.bib}

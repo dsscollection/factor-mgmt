@@ -54,6 +54,9 @@ source('../data/GSS.r')
 str(GSS)
 @
 
+
+
+
 Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
 
 <<warning=FALSE>>=
@@ -61,6 +64,7 @@ library(readxl)
 GSS <- read_excel("../data/GSS.xls")
 str(GSS)
 GSS <- GSS[,-14]
+#names(ds) <- make.names(names(ds), unique=TRUE)
 @
 
 That's a little better. Now we have preserved the character strings. But, the data is not yet useable in an analysis. 
@@ -166,6 +170,13 @@ GSS <- GSS %>%
 summary(GSS$Age)
 @
 
+Another way to do this:
+
+<<eval=FALSE>>=
+young <- as.character(18:64)
+derivedVariable(Age %in% young = "18-65", Age )
+@
+
 \section*{Acknowledgements}
 
 Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spring 2016 project in my SDS 291 class formed the inspiration for this paper. 
@@ -173,6 +184,13 @@ Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spr
 
 
 
+\section*{Ideas from Nick}
+Two ways to do each thing (as long as one isn't totally stupid)
+Why is this hard?
+Why is this error-prone?
+Missing values
+A few exercises for summer students
+Appendices for less interesting examples?
 
 
 \bibliography{bibliography.bib}
