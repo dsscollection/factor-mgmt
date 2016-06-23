@@ -1,1 +1,6 @@
 packrat/lib*/
+.tex
+.syntax.gz
+.log
+.bbl
+.blg
