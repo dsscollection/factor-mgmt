@@ -55,23 +55,22 @@ str(GSS)
 @
 
 
-
-
 Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
 
 <<warning=FALSE>>=
 library(readxl)
 GSS <- read_excel("../data/GSS.xls")
+names(GSS) <- make.names(names(GSS), unique=TRUE)
 str(GSS)
-GSS <- GSS[,-14]
-#names(ds) <- make.names(names(ds), unique=TRUE)
 @
 
 That's a little better. Now we have preserved the character strings. But, the data is not yet useable in an analysis. 
 
 \section*{Renaming the variables}
 
-One problem is that the variable names (while human readable) are full of spaces, so are hard to use. But, we can rename them. The \verb#rename()# function in the \pkg{dplyr} package is a good way to do this. 
+One problem is that the variable names (while human readable) are full of spaces, so are hard to use. But, we can rename them.
+
+There is a fragile way to do this in \pkg{base} \proglang{R}, but we'll use the more robust \verb#rename()# function from the \pkg{dplyr} package. \verb#rename()# 
 
 <<>>=
 library(dplyr)
