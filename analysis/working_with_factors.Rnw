@@ -57,6 +57,7 @@ str(GSS)
 
 Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
 
+
 <<warning=FALSE>>=
 library(readxl)
 GSS <- read_excel("../data/GSS.xls")
@@ -76,11 +77,14 @@ There is a fragile way to do this in \pkg{base} \proglang{R}, but we'll use the 
 library(dplyr)
 
 GSS <- GSS %>% 
-  rename(LaborStatus = `Labor force status`) %>%
-  rename(PolParty = `Political party affiliation`) %>%
-  rename(Age = `Age of respondent`)
+  rename(LaborStatus = Labor.force.status) %>%
+  rename(PolParty = Political.party.affiliation) %>%
+  rename(Age = Age.of.respondent)
 @
 
+<<>>=
+sessionInfo()
+@
 \section*{Considering some factor variables}
 Once we have variable names that are easier to work with, we can begin to think about how the data should be cleaned. 
 <<>>=
