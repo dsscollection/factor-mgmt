@@ -30,9 +30,12 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, size='footnotes
 
 \section*{Introduction}
 
+Categorical data is important in data science, particularly because so much survey data is categorical. While defensive programming is always important when working with data, categorical data presents some particular problems that can slip in without the analyst noticing. 
 
+In this paper, we discuss some places where analysts get tripped up when working with factor variables (R's data type for categorical data). 
 
-Factors are the data type that R uses for categorical data. For example, a gender variable might include the categories \verb#male#, \verb#female# and \verb#gender non-conforming#. Storing this information as a factor is the alternative to storing it as a series of character strings. 
+\section*{History of factors in R}
+Consider a gender variable including the categories \verb#male#, \verb#female# and \verb#gender non-conforming#. In R, there are two ways to store this information. One is to use a series of character strings, and the other is to store it as a factor.  
 
 Historically, storing categorical data as a factor variable was more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015}. However, R has changed to use hashed versions of all character strings, so the storage issue is no longer valid~\citep{Pen2015}. 
 
@@ -77,9 +80,9 @@ There is a fragile way to do this in \pkg{base} \proglang{R}, but we'll use the 
 library(dplyr)
 
 GSS <- GSS %>% 
-  rename(LaborStatus = Labor.force.status) %>%
-  rename(PolParty = Political.party.affiliation) %>%
-  rename(Age = Age.of.respondent)
+  rename(LaborStatus = Labor.force.status,
+         PolParty = Political.party.affiliation,
+         Age = Age.of.respondent)
 @
 
 <<>>=
@@ -89,8 +92,8 @@ sessionInfo()
 Once we have variable names that are easier to work with, we can begin to think about how the data should be cleaned. 
 <<>>=
 GSS <- GSS %>%
-  mutate(LaborStatus = factor(LaborStatus)) %>%
-  mutate(PolParty = factor(PolParty))
+  mutate(LaborStatus = factor(LaborStatus),
+         PolParty = factor(PolParty))
 
 levels(GSS$LaborStatus) # I wish I had a piece of dplyr code for this
 levels(GSS$PolParty)
@@ -115,6 +118,8 @@ levels(GSS$LaborStatus) <- c(levels(GSS$LaborStatus)[1:5],
                              "Working part time")
 summary(GSS$LaborStatus)
 @
+
+This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. If the data gets changed outside of R, this code will not perform as expected. Additionally, if the code gets run more than once, it can also lead to unexpected behavior. 
 
 \section*{Changing the labels of factors (dplyr)}
 
@@ -168,16 +173,16 @@ Of course, we're cheating a little bit here-- if we were going to use this as a 
 
 <<>>=
 GSS <- GSS %>%
-  mutate(Age = if_else(Age<65, "18-65", "65 and up")) %>%
-  mutate(Age = factor(Age))
+  mutate(Age = if_else(Age<65, "18-65", "65 and up"),
+         Age = factor(Age))
 summary(GSS$Age)
 @
 
 Another way to do this:
 
 <<eval=FALSE>>=
-young <- as.character(18:64)
-derivedVariable(Age %in% young = "18-65", Age )
+# young <- as.character(18:64)
+# derivedVariable(Age %in% young = "18-65", Age )
 @
 
 \section*{Acknowledgements}
