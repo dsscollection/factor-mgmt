@@ -16,9 +16,7 @@
 \keywords{}
 
 \begin{abstract}
-Wrangling of categorical data is an important part of the analysis cycle.  Many aspects of these operations can be tricky, particularly for complex transformations.  This paper discusses aspects of transformation of categorical 
-variables in R. We suggest defensive coding strategies and principles for data wrangling 
-to ensure data quality and sound analysis.
+Wrangling of categorical data is an important part of the analysis cycle.  Many aspects of these operations can be tricky, particularly for complex transformations.  This paper discusses aspects of transformation of categorical variables in R. We suggest defensive coding strategies and principles for data wrangling to ensure data quality and sound analysis.
 \end{abstract}
 
 \begin{document}
@@ -33,93 +31,55 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, size='footnotes
 
 \section*{Introduction}
 
-The wrangling of 
-categorical data is an important component in data science because so many variables are categorical. While defensive coding is always important for any analysis, categorical data presents some particular problems that can slip in without the analyst noticing. 
+The wrangling of categorical data is an important component in data science because so many variables are categorical. Gender, income bracket, and state are all examples of categorical data. While defensive coding is important for any analysis, categorical data presents particular problems that can slip in without the analyst noticing. 
 
-In this paper, we consider a number of common idioms that often arise in data cleaning and preparation, propose some guidelines for defensive coding, and discuss some settings where analysts often get tripped up when working with categorical variables and factor (R's data type for categorical data). 
+In this paper, we consider a number of common idioms that often arise in data cleaning and preparation, propose some guidelines for defensive coding, and discuss some settings where analysts often get tripped up when working with categorical variables and factors (R's data type for categorical data).
 
-\section*{History of factors in R}
-Consider a gender variable including the categories \verb#male#, \verb#female# and \verb#gender non-conforming#. In R, there are two ways to store this information. One is to use a series of character strings, and the other is to store it as a factor.  
+In particular, we are considering how categorical data is treated in \pkg{base} \proglang{R} versus the so-called tidyverse~\citep{Wic2014}. Tools from the tidyverse are discussed in another paper in this special issue, but briefly they aim to make analysis more pure, predictable, and pipeable. One canonical thought exercise is whether, after the analysis, a new version of the data could be supplied in the code and have parallel results come out the other end. Again, categorical data can make this even more complex. 
 
+\section*{}
+
+
+\section*{Factors in R}
+Consider a gender variable including the categories \verb#male#, \verb#female# and \verb#gender non-conforming#. In R, there are two ways to store this information. One is to use a series of character strings, and the other is to store it as a factor. 
 Historically, storing categorical data as a factor variable was more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015}. However, R has changed to use hashed versions of all character strings, so the storage issue is no longer a consideration~\citep{Pen2015}. 
 
-XX Ordered factors vs. unordered?
-
-
-Factors can be very tricky to deal with, since many operations applied to them return different values than when applied to character vectors.  As an example, consider an indicator of smoking status.
+Factors can be very tricky to deal with, since many operations applied to them return different values than when applied to character vectors.  As an example, consider a set of decades,
 
 <<>>=
-smokestatus <- c("Current", "Current", "Former", "Never")
-str(smokestatus[1])
-smokestatus == "Current"
-smokefactor <- factor(smokestatus)
-str(smokefactor[1])
-smokefactor == "Current"
+x1 <- c(10, 10, 20, 20, 40)
+x1f <- factor(x1)
+ds <- data.frame(x1, x1f)
+library(dplyr)
+ds <- mutate(ds, x1recover = as.numeric(x1f))
+ds
 @
 
-XX Amelia, this doesn't misbehave in the way that I had imagined.  Neither does:
+This is unexpected because \verb#as.numeric()# feels like the way to recover numeric information in the \pkg{base} \proglang{R} paradigm. Compare the following:
 
 <<>>=
-levels <- c(10, 10, 20, 20, 50, 50)
-levelgrp <- factor(levels, ordered=TRUE)
-levelgrp[3] < levelgrp[5]
-levelgrp==10
+as.numeric(c("hello"))
+as.numeric(factor(c("hello")))
 @
 
-XX can you find an example when it does mess you up?
+This behavior has led to an online movement against the default behavior of many of R's data import functions to take any variable composed as strings and automatically convert the variable to a factor. The tidyverse moves away from this default behavior, with functions from the \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their startup commands.)
 
-This behavior has led to the online \verb#stringsAsFactors=HELLNO# movement. This refers to the default behavior of many of R's data import functions to take any variable composed as strings and automatically convert the variable to a factor. Man in the R community have been moving away from this default behavior, with functions from Hadley Wickham's \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their 
-startup commands.)
-
-However, factor variables are important when it comes to modeling. When you pass a factor variable into \pkg{lm} or \pkg{glm}, \proglang{R} automatically creates dummy variables for each of the levels and picks one as a reference group. This behavior is lost if the variable is stored as a character vector.  
+Although the storage issues have been solved, and there are problems with defaulting strings to factors, factors are still necessary for some data analytic tasks. The most salient case is in modeling. When you pass a factor variable into \verb#lm# or \verb#glm#, \proglang{R} automatically creates dummy variables for each of the levels and picks one as a reference group. This behavior is lost if the variable is stored as a character vector. Factor variables also allow for the possibility of ordering between classes. Text strings \verb#low, medium, high# would not preserve the ordering inherent in the groups. Again, this can be important for modeling when doing ordinal logistic regression and multinomial logistic regression. 
 
 So, factors are important. But, they can often be hard to deal with. Because of the way the group numbers are stored separately from the factor labels, it can be easy to overwrite data in such a way that the original data is lost. In this paper, we will consider the best practices for working with factor data. 
 
-To do this, we will consider data from the General Social Survey. 
-
-
-\section*{Loading the data}
-
-We have several options for how to get this data. We could download it in SPSS or Stata formats and use the foreign package to read it in. The GSS download even provides an R file to do the translation for you. Here is the result of that:
+To do this, we will consider data from the General Social Survey. There are some import issues inherent to the data which are not particular to categorical data, so that processing is in Appendices \ref{load, rename}. We'll work with the data that has cleaned variable names.
 
 <<>>=
-source('../data/GSS.r')
-str(GSS)
+library(readr)
+GSS <- read_csv("../data/GSScleaned.csv")
+# Maybe I should use read.csv so I don't have to convert things to factors? 
 @
 
 
-Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
 
-
-<<warning=FALSE>>=
-library(readxl)
-GSS <- read_excel("../data/GSS.xls")
-names(GSS) <- make.names(names(GSS), unique=TRUE)
-str(GSS)
-@
-
-That's a little better. Now we have preserved the character strings. But, the data is not yet useable in an analysis. 
-
-\section*{Renaming the variables}
-
-One problem is that the variable names (while human readable) are full of spaces, so are hard to use. But, we can rename them.
-
-There is a fragile way to do this in \pkg{base} \proglang{R}, but we'll use the more robust \verb#rename()# function from the \pkg{dplyr} package. \verb#rename()# 
-
-<<>>=
-library(dplyr)
-
-GSS <- GSS %>% 
-  rename(LaborStatus = Labor.force.status,
-         PolParty = Political.party.affiliation,
-         Age = Age.of.respondent)
-@
-
-<<>>=
-sessionInfo()
-@
 \section*{Considering some factor variables}
-Once we have variable names that are easier to work with, we can begin to think about how the data should be cleaned. 
+
 <<>>=
 GSS <- GSS %>%
   mutate(LaborStatus = factor(LaborStatus),
@@ -361,7 +321,7 @@ sort(tally(~ title, data=merged), decreasing=TRUE)[1:3]
 
 \section*{Acknowledgements}
 
-Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spring 2016 project in my SDS 291 class formed the inspiration for this paper. 
+%Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spring 2016 project in my SDS 291 class formed the inspiration for this paper. 
 
 
 
@@ -372,6 +332,46 @@ Why is this hard?
 Why is this error-prone?
 Missing values
 Appendices for less interesting examples?
+
+\appendix
+\section*{Loading the data}\ref{load}
+
+We have several options for how to get this data. We could download it in SPSS or Stata formats and use the foreign package to read it in. The GSS download even provides an R file to do the translation for you. Here is the result of that:
+
+<<>>=
+source('../data/GSS.r')
+str(GSS)
+@
+
+
+Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
+
+
+<<warning=FALSE>>=
+library(readxl)
+GSS <- read_excel("../data/GSS.xls")
+names(GSS) <- make.names(names(GSS), unique=TRUE)
+str(GSS)
+@
+
+That's a little better. Now we have preserved the character strings. But, the data is not yet useable in an analysis. 
+
+\section*{Renaming the variables}\ref{reload}
+
+One problem is that the variable names (while human readable) are full of spaces, so are hard to use. But, we can rename them.
+
+There is a fragile way to do this in \pkg{base} \proglang{R}, but we'll use the more robust \verb#rename()# function from the \pkg{dplyr} package. \verb#rename()# 
+
+<<>>=
+library(dplyr)
+
+GSS <- GSS %>% 
+  rename(LaborStatus = Labor.force.status,
+         PolParty = Political.party.affiliation,
+         Age = Age.of.respondent)
+write_csv(GSS, path="../data/GSScleaned.csv")
+@
+
 
 
 \bibliography{bibliography.bib}
