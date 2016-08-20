@@ -76,7 +76,7 @@ This behavior has led to an online movement against the default behavior of many
 Although the storage issues have been solved, and there are problems with defaulting strings to factors, factors are still necessary for some data analytic tasks. The most salient case is in modeling. When you pass a factor variable into \verb#lm# or \verb#glm#, \proglang{R} automatically creates dummy variables for each of the levels and picks one as a reference group. This behavior is lost if the variable is stored as a character vector. Factor variables also allow for the possibility of ordering between classes. Text strings \verb#low, medium, high# would not preserve the ordering inherent in the groups. Again, this can be important for modeling when doing ordinal logistic regression and multinomial logistic regression. 
 So, factors are important. But, they can often be hard to deal with. Because of the way the group numbers are stored separately from the factor labels, it can be easy to overwrite data in such a way that the original data is lost. In this paper, we will consider the best practices for working with factor data. 
 
-To do this, we will consider data from the General Social Survey. There are some import issues inherent to the data which are not particular to categorical data, so that processing is in Appendices \ref{load, rename}. We'll work with the data that has cleaned variable names.
+To do this, we will consider data from the General Social Survey. There are some import issues inherent to the data which are not particular to categorical data, so that processing is in Appendices \ref{load}, \ref{rename}. We'll work with the data that has cleaned variable names.
 
 <<>>=
 GSS <- read.csv("../data/GSScleaned.csv")
@@ -144,12 +144,6 @@ GSS <- GSS %>%
   mutate(PolParty =  recode(PolParty, `Not str republican` = "Not a strong republican"))
 @
 
-\subsection*{Defensive coding}
-
-In addition to using tidy tools to recode factor levels, it is good to practice defensive coding. 
-
-
-
 \subsection*{Aside -- Editing whitespace out of levels}
 
 Whitespace can be dealt with when data is read, or later using string manipulations. The easiest way to do this is using \pkg{base} \proglang{R}. 
@@ -201,9 +195,12 @@ library(forcats)
 @
 
 \section*{Combining several levels into one}
+
+\subsection*{Combining discrete levels}
 This is another common task. Maybe you want fewer coefficients to interpret in your model, or the process that generated the data makes a finer distinction between categories than your research. For whatever the reason, you want to group together levels that are currently separate. 
 
-How I do this in base R:
+\subsection*{Fragile method (base R)}
+This method overwrites the labels of factor levels with repeated labels in order to group levels together. 
 <<>>=
 levels(GSS$LaborStatus) <- c("Not employed", "No answer",
                              "Other", "Not employed", 
@@ -211,31 +208,37 @@ levels(GSS$LaborStatus) <- c("Not employed", "No answer",
                              "Not employed", "Employed", "Employed")
 summary(GSS$LaborStatus)
 @
+As before, this is fragile because it depends on the order of the factor levels not changing, and on a human accurately counting the indices of all the levels they wish to change. 
+
+\subsection*{Robust method}
+
+<<>>=
+levels(GSS$Race.of.respondent)
+GSS <- GSS %>% 
+  mutate(Race.of.respondent =  recode(Race.of.respondent, `Black` = "Nonwhite", `Other` = "Nonwhite"))
+levels(GSS$Race.of.respondent)
+@
 
 
-
-\section*{Numerically combining many categories into one}
-This is something that is often a problem with data even when \verb#stringsasfactors=FALSE#. Often things like age or income are right censored, so there is a final category containing the lumped remainder of people. This means the data is necessarily at least a character string if not a factor. But, it feels natural to work with numeric expressions when recoding this data. 
+\section*{Combining numeric-type levels}
+This is something that is often a problem with data even when \verb#stringsasfactors=FALSE#. Often variables like age or income are right censored, so there is a final category containing the lumped remainder of people. This means the data is necessarily at least a character string if not a factor. But, it feels natural to work with numeric expressions when recoding this data. 
 
 In this data, age is provided as an integer for respondents 18-88, but then also includes the possible answer "89 or older" as well as a possible "No answer" and NA values. 
-<<>>=
-GSS <- GSS %>%
-  mutate(Age = factor(Age))
-summary(GSS$Age)
-@
 
 We might want to turn this into a factor variable with two levels: 18-65, and over 65. In this case, it would be much easier to deal with a conditional statement about the numeric values, rather than writing out each of the numbers as a character vector.  
 
-But, in order to do that we need to make it numeric. 
+\subsection*{Fragile method (base R)}
+In order to break this data apart as simply as possible, we need to make it numeric. To start, we recode the label for "89 or older" to read "89". Already, we are doing something fragile. 
 <<>>=
-# GSS$Age[GSS$Age == "No answer"] <- NA # Do I really need this? Nope!
 levels(GSS$Age) <- c(levels(GSS$Age)[1:71], "89", "No answer")
 GSS$Age <- as.numeric(as.character(GSS$Age))
 summary(GSS$Age)
+# Need to flesh out a base R approach to this. It's going to need some conditional logic. 
 @
 
 Of course, we're cheating a little bit here-- if we were going to use this as a numeric variable in an analysis, we wouldn't necessarily want to turn all the "89 or older" cases into the number "89". But, we're just on our way to a two-category factor, so those cases would have gone to the "65 and up" category one way or the other.
 
+\subsection*{Robust method}
 <<>>=
 GSS <- GSS %>%
   mutate(Age = if_else(Age<65, "18-65", "65 and up"),
@@ -243,22 +246,7 @@ GSS <- GSS %>%
 summary(GSS$Age)
 @
 
-Another way to do this:
-
-<<eval=FALSE>>=
-# young <- as.character(18:64)
-# derivedVariable(Age %in% young = "18-65", Age )
-@
-
-\section{Other examples}
-
-Here's a placeholder for the other examples.
-
-<<>>=
-library(dplyr); library(mosaic); library(readr)
-@
-
-\subsection{Creating derived categorical variable}
+\section*{Creating derived categorical variable}
 
 XX THESE ARE STILL WORDED AS TASKS
 
@@ -279,11 +267,21 @@ age&age (in years) \\ \hline
 Use these guidelines and the {\tt HELPsmall} dataset to create a new variable called {\tt abstinent} for those that reported no drinking based on the value of their {\tt i1} variable and {\tt moderate} for those that do not exceed the NIAAA guidelines.  All other non-missing values should be coded as {\tt highrisk}.
 
 <<>>=
+library(dplyr); library(mosaic); library(readr)
+@
+
+<<>>=
 data(HELPmiss)
 HELPsmall <- HELPmiss %>%
   mutate(i1 = ifelse(id==1, NA, i1)) %>%  # make one value missing
   select(sex, i1, i2, age)
 @
+
+\subsection*{Fragile method (base R)}
+
+to be fleshed out
+
+\subsection*{Robust method (dplyr)}
 
 <<>>=
 glimpse(HELPsmall)
@@ -303,9 +301,75 @@ HELPsmall <- with(HELPsmall,  # this won't work unless HELPsmall is made accessi
 tally( ~ drink_stat, data = HELPsmall)
 @
 
-\subsection{Creating derived categorical variables}
 
-XX move to appendix (since it duplicates the earlier example?)
+
+\section*{Defensive coding}
+
+It would be good practice to write conditional testing statements into code using factors. Here is some code that doesn't work:
+
+<<eval=FALSE>>=
+expect_equivalent(levels(GSS$Respondents.sex), c("Male", "Female"))
+@
+
+
+\section*{Acknowledgements}
+
+%Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spring 2016 project in my SDS 291 class formed the inspiration for this paper. 
+
+
+
+
+\section*{Ideas}
+Two ways to do each thing (as long as one isn't totally stupid)
+Why is this hard?
+Why is this error-prone?
+Missing values
+Appendices for less interesting examples?
+
+\appendix
+\Big{This is where appendices should start!}
+\section{Loading the data}\label{load}
+
+We have several options for how to get this data. We could download it in SPSS or Stata formats and use the foreign package to read it in. The GSS download even provides an R file to do the translation for you. Here is the result of that:
+
+<<>>=
+source('../data/GSS.r')
+str(GSS)
+@
+
+
+Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
+
+
+<<warning=FALSE>>=
+library(readxl)
+GSS <- read_excel("../data/GSS.xls")
+names(GSS) <- make.names(names(GSS), unique=TRUE)
+str(GSS)
+@
+
+That's a little better. Now we have preserved the character strings. But, the data is not yet usable in an analysis. 
+
+\section{Renaming the variables}\label{rename}
+
+One problem is that the variable names (while human readable) are full of spaces, so are hard to use. But, we can rename them.
+
+There is a fragile way to do this in \pkg{base} \proglang{R}, but we'll use the more robust \verb#rename()# function from the \pkg{dplyr} package. \verb#rename()# 
+
+<<>>=
+library(dplyr)
+
+GSS <- GSS %>% 
+  rename(LaborStatus = Labor.force.status,
+         PolParty = Political.party.affiliation,
+         Age = Age.of.respondent)
+write_csv(GSS, path="../data/GSScleaned.csv")
+@
+
+\section{Class exercise}
+As we see this paper being helpful at the undergraduate level, we have included the following as a possible exercise for students once they have mastered the basics of robust factor manipulation.
+
+
 
 Subjects in the HELP study were categorized into categories of drug and alcohol involvement, as displayed in the following table.
 
@@ -390,70 +454,6 @@ tally(~ title=="alcohol-none", data=merged)
 tally(~ title=="alcohol-other", data=merged)
 sort(tally(~ title, data=merged), decreasing=TRUE)[1:3]
 @
-
-\section*{Defensive coding}
-
-It would be good practice to write conditional testing statements into code using factors. Here is some code that doesn't work:
-
-<<eval=FALSE>>=
-expect_equivalent(levels(GSS$Respondents.sex), c("Male", "Female"))
-@
-
-
-\section*{Acknowledgements}
-
-%Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spring 2016 project in my SDS 291 class formed the inspiration for this paper. 
-
-
-
-
-\section*{Ideas}
-Two ways to do each thing (as long as one isn't totally stupid)
-Why is this hard?
-Why is this error-prone?
-Missing values
-Appendices for less interesting examples?
-
-\appendix
-\section*{Loading the data}\ref{load}
-
-We have several options for how to get this data. We could download it in SPSS or Stata formats and use the foreign package to read it in. The GSS download even provides an R file to do the translation for you. Here is the result of that:
-
-<<>>=
-source('../data/GSS.r')
-str(GSS)
-@
-
-
-Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
-
-
-<<warning=FALSE>>=
-library(readxl)
-GSS <- read_excel("../data/GSS.xls")
-names(GSS) <- make.names(names(GSS), unique=TRUE)
-str(GSS)
-@
-
-That's a little better. Now we have preserved the character strings. But, the data is not yet useable in an analysis. 
-
-\section*{Renaming the variables}\ref{reload}
-
-One problem is that the variable names (while human readable) are full of spaces, so are hard to use. But, we can rename them.
-
-There is a fragile way to do this in \pkg{base} \proglang{R}, but we'll use the more robust \verb#rename()# function from the \pkg{dplyr} package. \verb#rename()# 
-
-<<>>=
-library(dplyr)
-
-GSS <- GSS %>% 
-  rename(LaborStatus = Labor.force.status,
-         PolParty = Political.party.affiliation,
-         Age = Age.of.respondent)
-write_csv(GSS, path="../data/GSScleaned.csv")
-@
-
-
 
 \bibliography{bibliography.bib}
 
