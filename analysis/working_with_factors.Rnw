@@ -11,14 +11,15 @@
 
 \author[1]{Amelia McNamara}
 \author[2]{Nicholas J Horton}
-\affil[1]{Smith College}
-\affil[2]{Amherst College}
+\affil[1]{Statistical and Data Science, Smith College}
+\affil[2]{Mathematics and Statistics, Amherst College}
 
 
 \keywords{}
 
 \begin{abstract}
-Wrangling of categorical data is an important part of the analysis cycle.  Many aspects of these operations can be tricky, particularly for complex transformations.  This paper discusses aspects of transformation of categorical variables in R. We suggest defensive coding strategies and principles for data wrangling to ensure data quality and sound analysis.
+Data wrangling is a critical foundation of data science.
+Wrangling of categorical data is an important component of the analysis cycle.  Aspects of these operations can sometimes be tricky, particularly for complex transformations that arise in real-world settings.  This paper discusses aspects of categorical variable transformations in R. We consider several motivating examples, suggest defensive coding strategies, and outlines principles for data wrangling to help ensure data quality and sound analysis.
 \end{abstract}
 
 \begin{document}
