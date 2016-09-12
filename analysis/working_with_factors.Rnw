@@ -102,7 +102,7 @@ tasks:
 \end{enumerate}
 
 \section*{Changing the labels of factor levels}
-For this example, we will be considering the labor status variable. It has \Sexpr{length(levels(GSS$LaborStatus))} factor levels. Most of the labels are spelled out fully, but a few are strangely formatted. We want to change this. 
+For this example, we will be considering the labor status variable. It has \Sexpr{length(levels(GSS$Labor.force.status))} factor levels. Most of the labels are spelled out fully, but a few are strangely formatted. We want to change this. 
 
 This is a specific case of the more general problem of changing the text of one (or more) of the factor labels, so it appears more nicely formatted in a \pkg{ggplot2} plot, for example.
 
@@ -111,17 +111,17 @@ There are two typical approaches in \pkg{base} \proglang{R}. One is more compact
 
 \subsection*{Compact but fragile (base R)}
 <<>>=
-levels(GSS$LaborStatus)
-summary(GSS$LaborStatus)
+levels(GSS$Labor.force.status)
+summary(GSS$Labor.force.status)
 @
 
 <<>>=
-levels(GSS$LaborStatus) <- c(levels(GSS$LaborStatus)[1:5], 
+levels(GSS$Labor.force.status) <- c(levels(GSS$Labor.force.status)[1:5], 
                              "Temporarily not working", 
                              "Unemployed, laid off", 
                              "Working full time", 
                              "Working part time")
-summary(GSS$LaborStatus)
+summary(GSS$Labor.force.status)
 @
 
 This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k` comes first in the alphabet. If the data gets changed outside of R, for example so that responses currently label ``Working full time'' get labeled ``Full time work'', the code will silently fail with invalid results. 
@@ -132,11 +132,11 @@ The workflow will also fail if additional factor levels are added after the fact
 Another (more robust method) to recode this variable in \pkg{base} \proglang{R} is to use subsetting to overwrite particular values in the data. 
 
 <<>>=
-summary(GSS$PolParty)
-GSS$NewParty <- as.character(GSS$PolParty)
-GSS$NewParty[GSS$PolParty=="Ind,near dem"] <- "Independent, near democrat"
-GSS$NewParty[GSS$PolParty == "Ind,near rep"] <- "Independent, near republican"
-GSS$NewParty[GSS$PolParty == "Not str democrat"] <- "Not strong democrat"
+summary(GSS$Political.party.affiliation)
+GSS$NewParty <- as.character(GSS$Political.party.affiliation)
+GSS$NewParty[GSS$Political.party.affiliation=="Ind,near dem"] <- "Independent, near democrat"
+GSS$NewParty[GSS$Political.party.affiliation == "Ind,near rep"] <- "Independent, near republican"
+GSS$NewParty[GSS$Political.party.affiliation == "Not str democrat"] <- "Not strong democrat"
 GSS$NewParty <- factor(GSS$NewParty)
 summary(GSS$NewParty)
 @
@@ -150,7 +150,7 @@ The \verb#recode()# function in the \pkg{dplyr} package is a vector function, wh
 <<>>=
 GSS <- GSS %>% 
   mutate(dplyrParty =  
-    recode(PolParty, `Not str republican ` = "Not a strong republican",
+    recode(Political.party.affiliation, `Not str republican ` = "Not a strong republican",
                      `Ind,near dem` = "Independent, near democrat",
                      `Ind,near rep` = "Independent, near republican",
                      `Not str democrat` = "Not a strong democrat"))
@@ -162,7 +162,7 @@ In the above example, notice the trailing space after ``Not str republican" and 
 
 Whitespace can be dealt with when data is read, or later using string manipulations. This can be done using the \verb#trimws()# function  in \pkg{base} \proglang{R}. 
 <<>>=
-gender <-factor(c("male ", "male  ", "male    ", "male"))
+gender <- factor(c("male ", "male  ", "male    ", "male"))
 levels(gender)
 gender <- factor(trimws(gender))
 levels(gender)
@@ -233,11 +233,11 @@ This is another common task. Maybe you want fewer coefficients to interpret in y
 \subsubsection*{Fragile method (base R)}
 This method overwrites the labels of factor levels with repeated labels in order to group levels together. 
 <<>>=
-levels(GSS$LaborStatus) <- c("Not employed", "No answer",
+levels(GSS$Labor.force.status) <- c("Not employed", "No answer",
                              "Other", "Not employed", 
                              "Not employed", "Not employed", 
                              "Not employed", "Employed", "Employed")
-summary(GSS$LaborStatus)
+summary(GSS$Labor.force.status)
 @
 As before, this is fragile because it depends on the order of the factor levels not changing, and on a human accurately counting the indices of all the levels they wish to change. 
 
@@ -263,14 +263,15 @@ We might want to turn this into a factor variable with two levels: 18-65, and ov
 \subsection*{Fragile method (base R)}
 In order to break this data apart as simply as possible, we need to make it numeric. To start, we recode the label for ``89 or older" to read ``89". Already, we are doing something fragile. 
 <<>>=
-levels(GSS$Age)
-levels(GSS$Age) <- c(levels(GSS$Age)[1:71], "89", "No answer")
+GSS$BaseAge <- GSS$Age.of.respondent
+levels(GSS$BaseAge)
+levels(GSS$BaseAge) <- c(levels(GSS$BaseAge)[1:71], "89", "No answer")
 @
-When we look at the levels, we can see that the first 71 levels correspond to the ages 18-88, and are in the order we would expect, so we are leaving those as-is. Then we are overwriting the data where \verb#Age == "89 or older"# with simply \verb#89#. Once that is done, we can convert the factor to a character and then to a numeric.
+When we look at the levels, we can see that the first 71 levels correspond to the ages 18-88, and are in the order we would expect, so we are leaving those as-is. Then we are overwriting the data where \verb#BaseAge == "89 or older"# with simply \verb#89#. Once that is done, we can convert the factor to a character and then to a numeric.
 
 <<>>=
-GSS$Age <- as.numeric(as.character(GSS$Age))
-summary(GSS$Age)
+GSS$BaseAge <- as.numeric(as.character(GSS$BaseAge))
+summary(GSS$BaseAge)
 @
 
 We're avoiding the pitfall from the introduction here by not just using \verb#as.numeric()# on the factor variables (this would convert 18 to 1, 19 to 2, etc.). And of course, we're cheating a little bit here-- if we were going to use this as a numeric variable in an analysis, we wouldn't necessarily want to turn all the ``89 or older" cases into the number ``89". But, we're just on our way to a two-category factor, so those cases would have gone to the ``65 and up" category one way or the other.
@@ -280,28 +281,28 @@ Now, we can write some conditional logic
 splitf <- function(x){
   return(ifelse(x<65, "18-64", "65 and up"))
 }
-summary(GSS$Age)
-GSS$Age <- sapply(GSS$Age, splitf) # XX NH could this be combined into a single line?
-GSS$Age <- factor(GSS$Age)
-summary(GSS$Age)
+summary(GSS$BaseAge)
+GSS$BaseAge <- sapply(GSS$BaseAge, splitf) # XX NH could this be combined into a single line?
+GSS$BaseAge <- factor(GSS$BaseAge)
+summary(GSS$BaseAge)
 @
 
 \subsection*{Robust method}
-% XX NH this isn't exactly the starting point here. 
+The \pkg{dplyr} method follows similar logic. However, instead of explicitly overwriting \verb#89 or older# with the number 89, we use the \pkg{tidyr} \verb#extract_numeric()# function to remove the numbers from the factor labels. This works for the labels that already look numeric, like \verb#"18.000000# as well as for \verb#89 or older#. Then, we can include the conditional logic for splitting the variable within a mutate command. 
 <<>>=
+library(tidyr)
 GSS <- GSS %>%
-  mutate(Age = if_else(Age < 65, "18-65", "65 and up"),
-         Age = factor(Age))
-summary(GSS$Age)
+  mutate(dplyrAge = extract_numeric(Age.of.respondent)) %>%
+  mutate(dplyrAge = if_else(dplyrAge < 65, "18-65", "65 and up"),
+         dplyrAge = factor(dplyrAge))
+summary(GSS$dplyrAge)
 @
 
 \section*{Creating derived categorical variable}
-
-Challenges often arise when data scientists need to create derived
-categorical variable.  As an example, consider an 
-indicator of moderate drinking 
-status.
-The National Institutes of Alcohol Abuse and Alcoholism have published guidelines for moderate drinking.  These state that women, or men aged 65 or older should drink no more than one drink per day on average and no more than three drinks at a sitting.  
+%XX NH might be good to have the example with the GSS data. Perhaps something about income level and age together. 
+Challenges often arise when data scientists need to create derived categorical variables.  As an example, consider an indicator of moderate drinking status. The National Institutes of Alcohol Abuse and Alcoholism have published guidelines for moderate drinking. 
+%XX NH citation?
+These state that women, or men aged 65 or older should drink no more than one drink per day on average and no more than three drinks at a sitting.  
 The {\tt HELPmiss} dataset from the \pkg{mosaicData} package includes baseline data from a randomized clinical trial (Health Evaluation and Linkage to Primary Care).  
 
 
@@ -334,6 +335,7 @@ HELPsmall <- HELPmiss %>%
 \subsection*{Fragile method (base R)}
 
 % XX AM is this what you had in mind?
+% XX NH yep, looks great!
 <<>>=
 # create empty repository for new variable
 drinkstat <- character(length(HELPsmall$i1))
@@ -359,7 +361,7 @@ tally(~ drinkstat)
 <<>>=
 glimpse(HELPsmall)
 
-HELPsmall <- with(HELPsmall,  # this won't work unless HELPsmall is made accessible to mutate()
+HELPsmall <- with(HELPsmall,  # this won't work unless HELPsmall is made accessible to mutate() # XX NH why not HELPsmall %>% mutate()?
   mutate(HELPsmall,        
     drink_stat = case_when(
       i1 == 0 ~ "abstinent",
@@ -436,17 +438,15 @@ That's a little better. Now we have preserved the character strings. But, the da
 
 \section{Renaming the variables}\label{rename}
 
-One problem is that the variable names (while human readable) are full of spaces, so are hard to use. But, we can rename them.
+One problem is that some of the variable names are full of periods, so are hard to use. But, we can rename them.
 
 There is a fragile way to do this in \pkg{base} \proglang{R}, but we'll use the more robust \verb#rename()# function from the \pkg{dplyr} package. \verb#rename()# 
 
 <<>>=
 library(dplyr)
-
 GSS <- GSS %>% 
-  rename(LaborStatus = Labor.force.status,
-         PolParty = Political.party.affiliation,
-         Age = Age.of.respondent)
+  rename(Year = Gss.year.for.this.respondent.......................,
+         Occupational.prestige.score.1970 = Rs.occupational.prestige.score...1970.)
 write_csv(GSS, path="../data/GSScleaned.csv")
 @
 
