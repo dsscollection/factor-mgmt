@@ -25,7 +25,7 @@ Data wrangling is a critical foundation of data science. Wrangling of categorica
 
 <<setup, include=FALSE>>=
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, 
-                      size='footnotesize', cache=TRUE)
+                      size='footnotesize', cache=FALSE)
 @
 
 \flushbottom
@@ -81,7 +81,7 @@ While factors are important, they can often be hard to deal with. Because of the
 To motivate this process, we will consider data from the General Social Survey~\citep{GSS2016}. The General Social Survey is a product of the National Data Program for the Social Sciences, and the survey has been conducted since 1972 by NORC at the University of Chicago. It contains data on many factors of social life, and is widely used by social scientists. (In this paper we consider data from 2014.)
 % XX AM please review change to last sentence
 
-There are some import issues inherent to the data which are not particular to categorical data, so that processing is processing in Appendix A.. We'll work with the data that has cleaned variable names.
+There are some import issues inherent to the data which are not particular to categorical data, so that processing is processing in Appendix A. We'll work with the data that has cleaned variable names.
 
 <<>>=
 library(dplyr)
