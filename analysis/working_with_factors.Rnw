@@ -413,7 +413,7 @@ expect_equivalent(levels(GSS$Respondents.sex), c("Male", "Female"))
 \appendix
 
 \section*{Appendix A: Loading the data}\label{load}
-
+% Motivation for appendix-- fully reproducible
 We provide several options for how to get this data. We could download it in SPSS or Stata formats and use the foreign package to read it in. The GSS download even provides an R file to do the translation for you. Here is the result of 
 that process.
 
