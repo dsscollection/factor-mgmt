@@ -11,8 +11,8 @@
 
 \author[1]{Amelia McNamara}
 \author[2]{Nicholas J Horton}
-\affil[1]{Statistical and Data Sciences, Smith College}
-\affil[2]{Mathematics and Statistics, Amherst College}
+\affil[1]{Statistical and Data Sciences Program, Smith College}
+\affil[2]{Mathematics and Statistics Department, Amherst College}
 
 
 \keywords{}
@@ -36,20 +36,16 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 
 Wrangling skills provide an intellectual and practical foundation for data science. Because of the complexity of some transformations, careless data derivation operations can lead to errors or inconsistencies in analysis.The wrangling of categorical data presents particular challenges and is highly relevant because so many variables are categorical (e.g., gender, income bracket, U.S. state). Data ingested into \proglang{R} from spreadsheets can lead to additional problems, many of which are related to categorical data because of the different storage methods possible in both \proglang{R} and the spreadsheets themselves.
 
-In this paper, we consider a number of common idioms related to categorical data that often arise in data cleaning and preparation, propose some guidelines for defensive coding, and discuss some settings where analysts often get tripped up when working with categorical variables and factors (R's data type for categorical data).
+In this paper, we consider a number of common idioms related to categorical data that often arise in data cleaning and preparation, propose some guidelines for defensive coding, and discuss some settings where analysts often get tripped up when working with categorical variables and factors (R's data type for categorical data with two or more levels).
 
 
 To ground our work, we will compare and contrast how categorical data are treated in \pkg{base} \proglang{R} versus the so-called tidyverse~\citep{Wic2014}. Tools from the tidyverse, discussed in another paper in this special issue (see https://github.com/dsscollection/tidyflow), are designed to make analysis purer, more predictable, and pipeable. They help facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015}. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).
 
 \section*{The importance of tooling}
 
-It's important that statistical and data science tools foster good practice and provide a robust environment for data wrangling and data management.  In this section we will how factors XX AM define? are used in base \proglang{R} and enumerate problems that arise with their use.
+It's important that statistical and data science tools foster good practice and provide a robust environment for data wrangling and data management.  In this section we will describe how factors are used in base \proglang{R} and enumerate problems that arise with their use.
 
-% XX NH I don't know what is going on here. What was your point in the sentence? 
-
-% XX AM commented out This is where I think we will make the case about how base R is both fragile and often does the wrong thing (like the canonical first example) while the tidyverse is better. Better? More sophisticated? Tidy? Maybe the word "affordances" is warranted? 
-
-%These problems are hard, common, and important. 
+% XX AM This transition remains clunky: can we brainstorm?
 
 
 \section*{Factors in R}
@@ -69,22 +65,23 @@ ds <- ds %>%
 ds
 @
 
-Instead of creating a new variable with a numeric version of the value of the factor variable \verb#x1f# the variable is created with a factor number (i.e., 10 is mapped to 1, 20 is mapped to 2, and 40 is mapped to 3). This result is unexpected and unfortunate because \verb#as.numeric()# is intended to be recover numeric information in the \pkg{base} \proglang{R} paradigm when coercing a character variable. Compare the following:
+Instead of creating a new variable with a numeric version of the value of the factor variable \verb#x1f# the variable is created with a factor number (i.e., 10 is mapped to 1, 20 is mapped to 2, and 40 is mapped to 3). This result is unexpected because \verb#base::as.numeric()# is intended to recover numeric information by coercing a character variable. Compare the following:
 
 <<>>=
 as.numeric(c("hello"))
 as.numeric(factor(c("hello")))
 @
 
-The unfortunate behavior of factors in \proglang{R} has led to an online movement against the default behavior of many data import functions to take any variable composed as strings and automatically convert the variable to a factor. The tidyverse is part of this movement, with functions from the \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their startup commands.)
+The unfortunate behavior of factors in base \proglang{R} has led to an online movement against the default behavior of many data import functions to take any variable composed as strings and automatically convert the variable to a factor. The tidyverse is part of this movement, with functions from the \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their startup commands.)
 
 Although the storage issues have been solved, and there are problems with defaulting strings to factors, factors are still necessary for some data analytic tasks. The most salient case is in modeling. When you pass a factor variable into \verb#lm()# or \verb#glm()#, \proglang{R} automatically creates indicator (or more pejoratively `dummy') variables for each of the levels and picks one as a reference group. This behavior is lost if the variable is stored as a character vector. Factor variables also allow for the possibility of ordering between classes. Text strings \verb#low, medium, high# would not preserve the ordering inherent in the groups. Again, this can be important for modeling when doing ordinal logistic regression and multinomial logistic regression. 
 
 While factors are important, they can often be hard to deal with. Because of the way the group numbers are stored separately from the factor labels, it can be easy to overwrite data in such a way that the original data are lost. In this paper, we will suggest best practices for working with factor data. 
 
-To motivate this process, we will consider data from the General Social Survey~\citep{GSS2016}. The General Social Survey is a product of the National Data Program for the Social Sciences, and the survey has been conducted since 1972 by NORC at the University of Chicago. It contains data on many factors of social life, and is widely used by social scientists. We are only considering data from 2014 in this paper. 
+To motivate this process, we will consider data from the General Social Survey~\citep{GSS2016}. The General Social Survey is a product of the National Data Program for the Social Sciences, and the survey has been conducted since 1972 by NORC at the University of Chicago. It contains data on many factors of social life, and is widely used by social scientists. (In this paper we consider data from 2014.)
+% XX AM please review change to last sentence
 
-There are some import issues inherent to the data which are not particular to categorical data, so that processing is processing in Appendices \ref{load}, \ref{rename}. We'll work with the data that has cleaned variable names.
+There are some import issues inherent to the data which are not particular to categorical data, so that processing is processing in Appendix A.. We'll work with the data that has cleaned variable names.
 
 <<>>=
 library(dplyr)
@@ -404,19 +401,23 @@ expect_equivalent(levels(GSS$Respondents.sex), c("Male", "Female"))
 
 
 
-\section*{Ideas}
-Two ways to do each thing (as long as one isn't totally stupid)
-Why is this hard?
-Why is this error-prone?
-Missing values
-Appendices for less interesting examples?
+\section*{Queries for reviewers}
+\begin{enumerate}
+\item Is it useful to demonstrate two ways to do each thing (as long as one isn't totally stupid)
+\item Do we clarify why a given task is hard?
+\item Do we clarify why a given approach is error-prone?
+\item Should we focus more on Missing values
+\item Add appendices  or online resources for other examples?
+\end{enumerate}
 
 \appendix
 
-\section*{Loading the data}\label{load}
+\section*{Appendix A: Loading the data}\label{load}
 
-We provide several options for how to get this data. We could download it in SPSS or Stata formats and use the foreign package to read it in. The GSS download even provides an R file to do the translation for you. Here is the result of that:
+We provide several options for how to get this data. We could download it in SPSS or Stata formats and use the foreign package to read it in. The GSS download even provides an R file to do the translation for you. Here is the result of 
+that process.
 
+Note to reviewers: we will be moving the data to a public datasource
 % XX AM move data to a public datasource?
 <<>>=
 source('../data/GSS.r')
@@ -424,7 +425,7 @@ glimpse(GSS)
 @
 
 
-Obviously, this is less than ideal. Now, all the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
+Obviously, the result is less than ideal. All of the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to download the data as an Excel file and use the \pkg{readxl} package to load it. 
 
 
 <<warning=FALSE>>=
@@ -436,7 +437,7 @@ glimpse(GSS)
 
 That's a little better. Now we have preserved the character strings. But, the data is not yet usable in an analysis. 
 
-\section{Renaming the variables}\label{rename}
+%\subsection{Renaming the variables}\label{rename}  % XX AM note that I reformatted the appendix section calls
 
 One problem is that some of the variable names are full of periods, so are hard to use. But, we can rename them.
 
@@ -450,7 +451,7 @@ GSS <- GSS %>%
 write_csv(GSS, path="../data/GSScleaned.csv")
 @
 
-\section{Closing exercise}
+\section*{Appendix B: Closing exercise}
 We have included the following as a possible closing exercise.
 
 Subjects in the HELP study were also categorized into categories of drug and alcohol involvement, as displayed in the following table.
@@ -461,7 +462,7 @@ HELPbase <- HELPfull %>%
 tally( ~ PRIM_SUB + SECD_SUB, data=HELPbase)
 @
 
-Note that the following codings of substance use involvement were used:
+The following codings of substance use involvement were used in the study.
 
 \begin{tabular}{l|l}
 value&description \\ \hline
