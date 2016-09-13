@@ -392,7 +392,7 @@ We also might want to ensure that the factor labels are exactly what we were exp
 
 <<error = TRUE>>=
 library(testthat)
-# expect_equivalent(levels(GSS$Race.of.respondent), c("Nonwhite", "White")) # Doesn't work, but I wish it did.
+# expect_equivalent(levels(GSS$Race.of.respondent), c("White", "Nonwhite")) # Doesn't work, but I wish it did.
 expect_equivalent(levels(GSS$Race.of.respondent), c("Nonwhite", "White")) # Does work
 expect_equal(levels(GSS$Race.of.respondent), c("Nonwhite", "White")) # Does work
 expect_equivalent(levels(GSS$Race.of.respondent), levels(factor(c("Nonwhite", "White")))) # Does work
