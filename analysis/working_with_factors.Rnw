@@ -25,7 +25,7 @@ Data wrangling is a critical foundation of data science. Wrangling of categorica
 
 <<setup, include=FALSE>>=
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, 
-                      size='footnotesize', cache=TRUE)
+                      size='footnotesize', cache=FALSE)
 @
 
 \flushbottom
@@ -40,8 +40,6 @@ In this paper, we consider a number of common idioms related to categorical data
 
 
 To ground our work, we will compare and contrast how categorical data are treated in \pkg{base} \proglang{R} versus the so-called tidyverse~\citep{Wic2014}. Tools from the tidyverse, discussed in another paper in this special issue (see https://github.com/dsscollection/tidyflow), are designed to make analysis purer, more predictable, and pipeable. They help facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015}. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).
-
-\section*{The importance of tooling}
 
 It's important that statistical and data science tools foster good practice and provide a robust environment for data wrangling and data management.  In this section we will describe how factors are used in base \proglang{R} and enumerate problems that arise with their use.
 
@@ -81,7 +79,7 @@ While factors are important, they can often be hard to deal with. Because of the
 To motivate this process, we will consider data from the General Social Survey~\citep{GSS2016}. The General Social Survey is a product of the National Data Program for the Social Sciences, and the survey has been conducted since 1972 by NORC at the University of Chicago. It contains data on many factors of social life, and is widely used by social scientists. (In this paper we consider data from 2014.)
 % XX AM please review change to last sentence
 
-There are some import issues inherent to the data which are not particular to categorical data, so that processing is processing in Appendix A.. We'll work with the data that has cleaned variable names.
+There are some import issues inherent to the data which are not particular to categorical data, so that processing is processing in Appendix A. We'll work with the data that has cleaned variable names.
 
 <<>>=
 library(dplyr)
@@ -349,6 +347,7 @@ drinkstat[((HELPsmall$i1>1 | HELPsmall$i2>3) & HELPsmall$sex=="female") |
 # do we need to account for missing values?
 is.na(drinkstat) <- is.na(HELPsmall$i1) | is.na(HELPsmall$i2) | 
   is.na(HELPsmall$sex)
+drinkstat <- factor(drinkstat)
 tally(~ drinkstat)
 @
 
@@ -378,10 +377,9 @@ It is always good practice to write conditional testing statements into code usi
 the drinking status variable in the HELP dataset.
 <<>>=
 library(assertthat)
-levels(as.factor(drinkstat))
-assert_that(length(levels(as.factor(drinkstat)))==3)
+levels(drinkstat)
+assert_that(length(levels(drinkstat))==3)
 @
-% XX AM I'm not happy about the as.factor() I added above...
 
 Similar code could be used to check other conditions to verify that 
 recoding has been done successfully.
@@ -390,13 +388,16 @@ Here is some code that doesn't work:
 % XX AM: I'm confused by this example.
 
 <<eval=FALSE>>=
+library(testthat)
 expect_equivalent(levels(GSS$Respondents.sex), c("Male", "Female"))
 @
+
+\section*{Conclusion}
 
 
 \section*{Acknowledgements}
 
-%Thanks to my students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spring 2016 project in my SDS 291 class formed the inspiration for this paper. 
+%Thanks to my spring 2016 students Kelcie Grenier, Kat Kyuchukov, and Emily Ruppel, whose spring 2016 project in my SDS 291 class formed the inspiration for this paper. 
 
 
 
