@@ -25,7 +25,7 @@ Data wrangling is a critical foundation of data science. Wrangling of categorica
 
 <<setup, include=FALSE>>=
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, 
-                      size='footnotesize', cache=TRUE, error=TRUE, tidy=FALSE)
+                      size='footnotesize', cache=FALSE, error=TRUE, tidy=FALSE)
 @
 
 \flushbottom
