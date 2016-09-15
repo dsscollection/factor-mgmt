@@ -314,11 +314,10 @@ summary(GSS$dplyrAge)
 @
 
 \section*{Creating derived categorical variable}
-%XX NH might be good to have the example with the GSS data. Perhaps something about income level and age together. 
 Challenges often arise when data scientists need to create derived categorical variables.  As an example, consider an indicator of moderate drinking status. The National Institutes of Alcohol Abuse and Alcoholism have published guidelines for moderate drinking \cite{rethinkdrink}. 
 These guidelines state that women, or men aged 65 or older should drink no more than one drink per day on average and no more than three drinks on any single day or at a sitting.
 Men under age 65 should drink no more than two drinks per day on average and no more than four drinks on any single day.
-The {\tt HELPmiss} dataset from the \pkg{mosaicData} package includes baseline data from a randomized clinical trial (Health Evaluation and Linkage to Primary Care).  These subjects were recruited from a detoxification center, hence those that are alcohol-involved have extremely high rates of drinking.
+The {\tt HELPmiss} dataset from the \pkg{mosaicData} package includes baseline data from a randomized clinical trial (Health Evaluation and Linkage to Primary Care) \cite{same:lars:hort:2003}.  These subjects were recruited from a detoxification center, hence those that are alcohol-involved have extremely high rates of drinking.
 
 
 \begin{tabular}{l|l}
