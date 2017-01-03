@@ -9,3 +9,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Zev review
 
+- We've edited the abstract to be more indicative of the content of the paper, and more references have been incorporated into the introduction for additional context. 
+
+- Removed 'much' from paper, and reduced number of 'that's.

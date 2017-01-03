@@ -75,7 +75,7 @@ While factors are important, they can often be hard to deal with. Because of the
 
 To motivate this process, we will consider data from the General Social Survey~\citep{GSS2016}. The General Social Survey is a product of the National Data Program for the Social Sciences, and the survey has been conducted since 1972 by NORC at the University of Chicago. It contains data on many factors of social life, and is widely used by social scientists. (In this paper we consider data from 2014.)
 
-There are some import issues inherent to the data which are not particular to categorical data (see Appendix A for details). We'll work with the data that has cleaned variable names.
+There are some import issues inherent to the data which are not particular to categorical data (see Appendix A for details). We'll work with the data with cleaned variable names.
 
 <<>>=
 library(dplyr)
@@ -91,14 +91,14 @@ The remainder of this paper is organized around case studies (examples) related 
 \item Making derived factor variables.
 \end{enumerate}
 
-Each case study begins with a problem, and then presents several solutions. Typically, a method using only \pkg{base} \proglang{R} functions is contrasted with an approach from the tidyverse with some annotations of the code as needed. We will argue the tidyverse solution is more robust. 
+Each case study begins with a problem, and presents several solutions. Typically, a method using only \pkg{base} \proglang{R} functions is contrasted with an approach from the tidyverse with some annotations of the code as needed. We will argue the tidyverse solution is more robust. 
 
 \section*{Changing the labels of factor levels}
 In our first example, we will be considering the labor status variable. It has \Sexpr{length(levels(GSS$Labor.force.status))} factor levels. Most of the labels are spelled out fully, but a few are strangely formatted. We want to change this. 
 
 This is a specific case of the more general problem of changing the text of one (or more) of the factor labels, so it appears more nicely formatted in a \pkg{ggplot2} plot, for example.
 
-There are two typical approaches in \pkg{base} \proglang{R}. One is more compact, but depends on the levels of the factor not changing in the data being fed in, and the other is more robust, but extremely verbose. In contrast, the \pkg{dplyr} package offers a much more human readable method, while also supporting reproducibility. 
+There are two typical approaches in \pkg{base} \proglang{R}. One is more compact, but depends on the levels of the factor not changing in the data being fed in, and the other is more robust, but extremely verbose. In contrast, the \pkg{dplyr} package offers a more human readable method, while also supporting reproducibility. 
 
 
 \subsection*{Compact but fragile (base R)}
@@ -136,12 +136,12 @@ GSS$NewParty <- factor(GSS$NewParty)
 summary(GSS$NewParty)
 @
 
-This approach is much more robust, because if the labels or ordering of levels changes before this code is run it will not overwrite labels on the incorrect data. However, this approach has a number of limitations in addition to being tedious and error prone. It is possible to miss cases, and misspelling and cut-and-paste errors can mean pieces of the code do not actually do anything. 
+This approach is more robust, because if the labels or ordering of levels changes before this code is run it will not overwrite labels on the incorrect data. However, this approach has a number of limitations in addition to being tedious and error prone. It is possible to miss cases, and misspelling and cut-and-paste errors can mean pieces of the code do not actually do anything. 
 
 
 \subsection*{Direct and robust (dplyr)}
 
-The \verb#recode()# function in the \pkg{dplyr} package is a vector function, which combines the robustness of the second base R method while also reducing the verbosity. It still suffers from the problem of misspelling and cut-and-paste errors, because it will not throw errors if you try to recode a level that does not exist. 
+The \verb#recode()# function in the \pkg{dplyr} package is a vector function, which combines the robustness of the second base R method while also reducing the verbosity. It still suffers from the problem of misspelling and cut-and-paste errors, because it will not throw errors if you try to recode a non-existent level. 
 <<>>=
 GSS <- GSS %>% 
   mutate(dplyrParty =  
@@ -234,7 +234,7 @@ summary(GSS$Opinion.of.family.income)
 \section*{Combining several levels into one}
 
 \subsection*{Combining discrete levels}
-This is another common task. Maybe you want fewer coefficients in your model, or the process that generated the data makes a finer distinction between categories than your research. For whatever the reason, you want to group together levels that are currently separate. 
+This is another common task. Maybe you want fewer coefficients in your model, or the data-generating process makes a finer distinction between categories than your research. For whatever the reason, you want to group together levels that are currently separate. 
 
 \subsubsection*{Fragile method (base R)}
 This method overwrites the labels of factor levels with repeated labels in order to group levels together. 
@@ -262,9 +262,9 @@ levels(GSS$Race.of.respondent)
 \subsection*{Combining numeric-type levels}
 Combining numeric-type levels is a frequently-occurring problem even when \verb#stringsasfactors=FALSE#. Often variables like age or income are right-censored, so there is a final category containing the lumped remainder of people. This means the data is necessarily at least a character string if not a factor. However, it may be more natural to work with numeric expressions when recoding this data. 
 
-In this data, age is provided as an integer for respondents 18-88, but then also includes the possible answer ``89 or older'' as well as a possible ``No answer'' and NA values. 
+In this data, age is provided as an integer for respondents 18-88, but also includes the possible answer ``89 or older'' as well as a possible ``No answer'' and NA values. 
 
-We might want to turn this into a factor variable with two levels: 18-65, and over 65. In this case, it would be much easier to deal with a conditional statement about the numeric values, rather than writing out each of the numbers as a character vector.  
+We might want to turn this into a factor variable with two levels: 18-65, and over 65. In this case, it would be easier to deal with a conditional statement about the numeric values, rather than writing out each of the numbers as a character vector.  
 
 \subsubsection*{Fragile method (base R)}
 In order to break this data apart as simply as possible, we need to make it numeric. To start, we recode the label for ``89 or older" to read ``89". Already, we are doing something fragile. 
@@ -273,14 +273,14 @@ GSS$BaseAge <- GSS$Age.of.respondent
 levels(GSS$BaseAge)
 levels(GSS$BaseAge) <- c(levels(GSS$BaseAge)[1:71], "89", "No answer")
 @
-When we look at the levels, we can see the first 71 levels correspond to the ages 18-88, and are in the order we would expect, so we are leaving those as-is. Then we are overwriting the data where \verb#BaseAge == "89 or older"# with simply \verb#89#. Once that is done, we can convert the factor to a character vector and then to a numeric one.
+When we look at the levels, we can see the first 71 levels correspond to the ages 18-88, and are in the order we would expect, so we are leaving those as-is. Then we are overwriting the data where \verb#BaseAge == "89 or older"# with simply \verb#89#. Finally, we can convert the factor to a character vector and then to a numeric one.
 
 <<>>=
 GSS$BaseAge <- as.numeric(as.character(GSS$BaseAge))
 summary(GSS$BaseAge)
 @
 
-We're avoiding the pitfall from the introduction here by not just using \verb#as.numeric()# on the factor variables (this would convert 18 to 1, 19 to 2, etc.). And of course, we're cheating a little bit here-- if we were going to use this as a numeric variable in an analysis, we wouldn't necessarily want to turn all the ``89 or older" cases into the number ``89". But, we're on our way to a two-category factor, so those cases would have gone to the ``65 and up" category one way or the other.
+We're avoiding the pitfall from the introduction here by not simply using \verb#as.numeric()# on the factor variables (this would convert 18 to 1, 19 to 2, etc.). And of course, we're cheating a little bit here-- if we were going to use this as a numeric variable in an analysis, we wouldn't necessarily want to turn all the ``89 or older" cases into the number ``89". But, we're on our way to a two-category factor, so those cases would have gone to the ``65 and up" category one way or the other.
 
 Now, we can write some conditional logic
 <<>>=
@@ -379,7 +379,7 @@ HELPsmall <- with(HELPsmall,  # this won't work with current dplyr
 tally( ~ drink_stat, exclude=NULL, data = HELPsmall)
 @
 
-In the robust tidyverse method, the same logic is used, but the conditions are much clearer and more comprehensible.  Instead of one complex Boolean condition for \verb#moderate#, three separate lines can be used to match the different options. While the end result is the same, this code is more human readable and it is harder to miss possible edge cases. 
+In the robust tidyverse method, the same logic is used, but the conditions are clearer and more comprehensible.  Instead of one complex Boolean condition for \verb#moderate#, three separate lines can be used to match the different options. While the end result is the same, this code is more human readable and it is harder to miss possible edge cases. 
 
 
 \section*{Defensive coding}
