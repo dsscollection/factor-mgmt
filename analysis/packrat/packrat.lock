@@ -280,6 +280,18 @@ Source: CRAN
 Version: 0.3-10
 Hash: 05d7ad64db29a39d1b02c4b9f1f4edb2
 
+Package: pryr
+Source: CRAN
+Version: 0.1.2
+Hash: 11d3855cc4309fc37444d82a38f45f09
+Requires: Rcpp, stringr
+
+Package: random
+Source: CRAN
+Version: 0.2.5
+Hash: 7937ecde8ffd0a5bddf97f8a980c849d
+Requires: curl
+
 Package: readr
 Source: CRAN
 Version: 0.2.2
