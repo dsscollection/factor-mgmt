@@ -367,7 +367,7 @@ drinkstat[((HELPsmall$i1>1 | HELPsmall$i2>3) & HELPsmall$sex=="female") |
 is.na(drinkstat) <- is.na(HELPsmall$i1) | is.na(HELPsmall$i2) | 
   is.na(HELPsmall$sex)
 drinkstat <- factor(drinkstat)
-tally(~ drinkstat, exclude=NULL)
+table(drinkstat, useNA = "always")
 @
 
 While this approach works, it is hard to follow or to debug. The logical conditions are all correctly coded, but require many repetitions of \verb#HELPsmall$variable#, and the missing value was not handled by default (without the \verb#is.na()# call, the missing value would default to be \verb#"highrisk"# because of their extreme value for \verb#i2#). 
