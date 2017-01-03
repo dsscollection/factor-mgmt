@@ -18,8 +18,7 @@
 \keywords{statistical computing; data derivation; data science; data management}
 
 \begin{abstract}
-Data wrangling is a critical foundation of data science. Wrangling of categorical data is an important component of the 
-data preparation process. Aspects of these operations can sometimes be tricky, particularly for complex transformations arising in real-world settings.  This paper discusses aspects of categorical variable transformations in R. We consider several motivating examples, suggest defensive coding strategies, and outline principles for data wrangling to help ensure data quality and sound analysis.
+Data wrangling is a critical foundation of data science, and wrangling of categorical data is an important component of this process. However, categorical data can introduce unique issues in data wrangling, particularly in real-world settings with collaborators and periodically-updated data. This paper discusses common problems arising from categorical variable transformations in R, as well as potential solutions to the problems. For each problem, we present at least two strategies for management, one in base R and the other from the so-called `tidyverse.' We consider several motivating examples, suggest defensive coding strategies, and outline principles for data wrangling to help ensure data quality and sound analysis.
 \end{abstract}
 
 \begin{document}
@@ -35,11 +34,11 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 
 \section*{Introduction}
 
-Wrangling skills provide an intellectual and practical foundation for data science. Because of the complexity of some transformations, careless data derivation operations can lead to errors or inconsistencies in analysis. The wrangling of categorical data presents particular challenges and is highly relevant because so many variables are categorical (e.g., gender, income bracket, U.S. state). 
+Wrangling skills provide an intellectual and practical foundation for data science. Because of the complexity of some transformations, careless data derivation operations can lead to errors or inconsistencies in analysis~\citep{HerMir2015, FitzPen2014}. The wrangling of categorical data presents particular challenges and is highly relevant because so many variables are categorical (e.g., gender, income bracket, U.S. state). 
 
 It's important that statistical and data science tools foster good practice and provide a robust environment for data wrangling and data management.  This paper focuses on how \proglang{R} deals with categorical data, and showcases best practices for categorical data manipulation in \proglang{R} to produce reproducible workflows. 
 
-In this paper, we consider a number of common idioms related to categorical data that arise frequently in data cleaning and preparation, propose some guidelines for defensive coding, and discuss some settings where analysts often get tripped up when working with categorical data. For example, data ingested into \proglang{R} from spreadsheets can lead to problems with categorical data because of the different storage methods possible in both \proglang{R} and the spreadsheets themselves. The examples below will help flag when these issues arise or avoid them altogether. 
+In this paper, we consider a number of common idioms related to categorical data that arise frequently in data cleaning and preparation, propose some guidelines for defensive coding, and discuss settings where analysts often get tripped up when working with categorical data. For example, data ingested into \proglang{R} from spreadsheets can lead to problems with categorical data because of the different storage methods possible in both \proglang{R} and the spreadsheets themselves~\citep{WilBry2016}. The examples below will help flag when these issues arise or avoid them altogether. 
 
 To ground our work, we will compare and contrast how categorical data are treated in \pkg{base} \proglang{R} versus the so-called tidyverse~\citep{Wic2014}. Tools from the tidyverse, discussed in another paper in this special issue (see https://github.com/dsscollection/tidyflow), are designed to make analysis purer, more predictable, and pipeable. They help facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015}. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).
 

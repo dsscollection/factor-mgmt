@@ -1,6 +1,6 @@
 PackratFormat: 1.4
 PackratVersion: 0.4.8.2
-RVersion: 3.3.1
+RVersion: 3.3.0
 Repos: CRAN=https://cran.rstudio.com/
 
 Package: BH
@@ -109,8 +109,8 @@ GithubSha1: 6153e136fa9397e88478fa6270d9d1f02eb5153e
 
 Package: evaluate
 Source: CRAN
-Version: 0.9
-Hash: cf338d73ba4ee3a4fefec612cdfd38db
+Version: 0.10
+Hash: c3601a10c987d439e0c63ec635234a76
 Requires: stringr
 
 Package: forcats
@@ -190,9 +190,9 @@ Hash: f32817e181c39ede83fdd3e699348b69
 
 Package: knitr
 Source: CRAN
-Version: 1.14
-Hash: e7b411f5a5512295a260a45683fa0c4a
-Requires: digest, evaluate, formatR, highr, markdown, stringr, yaml
+Version: 1.15.1
+Hash: eed7437e2b614c9e3923b7932b16ac97
+Requires: digest, evaluate, highr, markdown, stringr, yaml
 
 Package: labeling
 Source: CRAN
@@ -324,8 +324,8 @@ Requires: DBI, RSQLite, chron, gsubfn, proto
 
 Package: stringi
 Source: CRAN
-Version: 1.1.1
-Hash: 48f2afc5dfecb65ba32a87d38b3533ff
+Version: 1.1.2
+Hash: 1ad6b1cc11d982ac233bf2fa2f7c9684
 
 Package: stringr
 Source: CRAN
@@ -363,5 +363,5 @@ Hash: 774eb7be9087cdc24b53b74e5359cfac
 
 Package: yaml
 Source: CRAN
-Version: 2.1.13
-Hash: 4854ccabebc225e8a7309fb4a74980de
+Version: 2.1.14
+Hash: c81230c3a7d9ba20607ad6b4331173d1
