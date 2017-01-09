@@ -55,12 +55,9 @@ OUR RESPONSE: Thanks for pointing this out. We have softened the wording to refl
 
 ``Historically, storing categorical data as a factor variable was considerably more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015, Lum2015}. However, \proglang{R} uses hashed versions of all character strings, so the storage is less of an issue~\citep{Pen2015}. For historical (or possibly anachronistic) reasons, many functions store variables by default as factors.''
 
-
-
 > **Line 55** I'm not sure pejorative is the right word there, I would drop the piece in parenthesis (or replace with "colloquially" or something)
 
 OUR RESPONSE: We have replaced "pejoratively" with "colloquially"
-
 
 > **Line 55** You say "This behavior is lost if the variable is character" referring to creating indicator variables but this is not true, R will still automatically create indicators but you're stuck with the first alphabetic string as your baseline.
 
@@ -100,7 +97,6 @@ test <- factor(GSS$Marital.status, levels = c("Single", "Married", "Single", "No
 summary(test)
 ```
 
-
 > **Line 167** Using `parse_number()` in this context seems dangerous. You need to be very sure that the strings with a number have a relevant number. You could accidentally add a number that is not meaningful. How about an example where you have "3 Errors" or something?
 
 OUR RESPONSE: We agree and have incorporated your comments into the paper, after the example.  
@@ -125,4 +121,3 @@ OUR RESPONSE: We've clarified this in the text: the second approach doesn't use 
 > **Line 201** This sentence is hard to follow consider rewriting.
 
 OUR RESPONSE: We've rewritten the offending sentence and added a second clarifying statement. 
-
