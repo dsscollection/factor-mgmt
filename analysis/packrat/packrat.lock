@@ -114,14 +114,10 @@ Hash: c3601a10c987d439e0c63ec635234a76
 Requires: stringr
 
 Package: forcats
-Source: github
-Version: 0.0.0.9000
-Hash: 0d634c0065a6ec906879410a6202f9e7
+Source: CRAN
+Version: 0.1.1
+Hash: 7f93e560ba45f278e1d66df743747d2a
 Requires: magrittr, tibble
-GithubRepo: forcats
-GithubUsername: hadley
-GithubRef: master
-GithubSha1: de464c40db5db10f0c13377e0fc306e76fed6561
 
 Package: formatR
 Source: CRAN
