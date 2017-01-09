@@ -119,7 +119,6 @@ $(document).ready(function () {
 </div>
 
 
-<p><strong>General</strong></p>
 <blockquote>
 <p>You’ve done a nice job with this, I learned several new functions from <code>dplyr</code> and I think it will be helpful to R users. None of the issues I bring up below are very big. I do think, though, that the abstract and intro could use a little work. I think you need to be more specific about the problems faced when working with categorical data and make the first two sentences of both the abstract and introduction more interesting and inviting.</p>
 </blockquote>
@@ -174,16 +173,6 @@ pryr::object_size(x) # 8MB</code></pre>
 <blockquote>
 <p><strong>Line 55</strong> You say “This behavior is lost if the variable is character” referring to creating indicator variables but this is not true, R will still automatically create indicators but you’re stuck with the first alphabetic string as your baseline.</p>
 </blockquote>
-<pre class="r"><code>dat &lt;- data.frame(a= c(&quot;A&quot;, &quot;B&quot;), b= 1, stringsAsFactors = FALSE)
-model.matrix(~., data= dat)</code></pre>
-<pre><code>##   (Intercept) aB b
-## 1           1  0 1
-## 2           1  1 1
-## attr(,&quot;assign&quot;)
-## [1] 0 1 2
-## attr(,&quot;contrasts&quot;)
-## attr(,&quot;contrasts&quot;)$a
-## [1] &quot;contr.treatment&quot;</code></pre>
 <p>OUR RESPONSE: We edited the section on character vectors in linear modeling to be more accurate.</p>
 <blockquote>
 <p><strong>Line 90</strong> Perhaps not say “silently fail”. It will result is mislabeling right?</p>
