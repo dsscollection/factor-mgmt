@@ -1,0 +1,128 @@
+---
+title: "Response to Reviewer Zev Ross"
+output: html_document
+---
+
+**General**
+ 
+> You've done a nice job with this, I learned several new functions from `dplyr` and I think it will be helpful to R users. None of the issues I bring up below are very big. I do think, though, that the abstract and intro could use a little work. I think you need to be more specific about the problems faced when working with categorical data and make the first two sentences of both the abstract and introduction more interesting and inviting.
+
+OUR RESPONSE: Thanks for the positive comments and the very helpful suggestions. We've addressed them throughout. See specific comments. 
+
+> In terms of language I think there are a couple of places where you should probably make it a bit more formal. I also think that you have quite a few places where you say "much clearer", "much more robust" etc, I would drop the "much". Show the readers the "much clearer" through the code/examples.
+
+OUR RESPONSE:  Removed 'much' from paper, and reduced number of 'that's.
+
+> Answers to your questions:
+>
+> 1. *Is it useful to demonstrate two ways to do each thing (as long as one isn’t totally stupid)*: Yes I think having two ways is good. 
+2. *Do we clarify why each of the tasks are hard?*: I'm not positive what you're asking, but I think your introduction/abstract needs to lay out more clearly specific issues that arise -- miscoding, etc
+3. *Do we clarify why each of the standard approaches are error-prone?*: Like previous question, are you asking if you succeeded? I think so.
+4. *Should we focus more on missing values? less?* I think that probably each one of your examples should have a missing values since this is the real world. But if this adds a ton of extra code don't bother -- except if a dplyr approach is much simpler.
+5. *Add appendices or online resources for other examples? Move closing exercise to be online only?* This is a question for Jenny and how long it can be
+6. *Add other references?* probably no need. Might be useful to have a reference or two describing why factors were hard-coded into R when you read data etc. Hadley mentioned that in the early days R users were 90% stats people (not sure if you could find a reference for this).
+
+OUR RESPONSE: Thanks for these helpful answers. 
+
+> **Abstract:** the abstract feels like bullet points and the first two bullet points are pretty obvious. Can you spice up a bit? "Categorical data presents hidden challenges for even the most seasoned data scientist. Misinterpretation, miscoding and XX are common..." I don't know
+
+OUR RESPONSE: We've edited the abstract to be more indicative of the content of the paper, and more references have been incorporated into the introduction for additional context. 
+
+> **First paragraph, line 13**: I'm not sure how the second sentence about "the complexity of some transformations" fits in here. By transformation are you referring to dummy coding etc? I would drop that sentence, then add a sentence at the end of that first paragraph with an explanation of the common pitfalls -- you have "The wrangling of cat data presents challenges". Then describe a couple of the challenges/pitfalls.
+
+OUR RESPONSE: We agree with the comment about "the complexity of some transformations," so we have removed that and added two additional sentences with high-level descriptions of problems that might occur. 
+
+> **Second P, line 17** You describe "In this paper", in paragraph 3 so I would drop P2 or work that into P3.
+
+OUR RESPONSE: We've worked the paragraphs in together. 
+
+> **Line 29** where you say "a new version of the data could be supplied with updated results produced", this is true of all R code really, I would either drop this sentence or be a little more specific linking with tidy tools.
+
+OUR RESPONSE: To your comment that "all R code" could have new data passed to it and produce updated results, we believe that all well-written R code should have these qualities, but it is certainly not true of all R code. For example, analysis which relies on line numbers for subsetting will not perform as expected on updated data. We added a sentence to this effect. 
+
+> **Line 39** Is this true? I find that factors take up half as much space
+
+```{r}
+x <- random::randomStrings(n = 100)
+x <- sample(x, 1000000, replace = TRUE)
+pryr::object_size(x) # 8MB
+pryr::object_size(factor(x)) #4.01MB
+```
+
+OUR RESPONSE: Thanks for pointing this out. We have softened the wording to reflect the fact that it is still more efficient to store strings as factors:
+
+``Historically, storing categorical data as a factor variable was considerably more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015, Lum2015}. However, \proglang{R} uses hashed versions of all character strings, so the storage is less of an issue~\citep{Pen2015}. For historical (or possibly anachronistic) reasons, many functions store variables by default as factors.''
+
+
+> **Line 55** I'm not sure pejorative is the right word there, I would drop the piece in parenthesis (or replace with "colloquially" or something)
+
+OUR RESPONSE: We have replaced "pejoratively" with "colloquially"
+
+> **Line 55** You say "This behavior is lost if the variable is character" referring to creating indicator variables but this is not true, R will still automatically create indicators but you're stuck with the first alphabetic string as your baseline.
+
+```{r}
+dat <- data.frame(a= c("A", "B"), b= 1, stringsAsFactors = FALSE)
+model.matrix(~., data= dat)
+```
+
+OUR RESPONSE: We edited the section on character vectors in linear modeling to be more accurate. 
+
+> **Line 90** Perhaps not say "silently fail". It will result is mislabeling right?
+
+OUR RESPONSE: We changed the sentence from "silently fail" to ``the code will not throw errors, but will mislabel all the data such that the `Labor.force.status` variable is essentially meaningless''
+
+**Line 92/3** you say "In our experience" and then reference someone, no need for reference is this is your experience.
+
+OUR RESPONSE: Fixed
+
+**Line 102** I didn't know about the `recode` function!
+
+OUR RESPONSE: Neat stuff, huh?
+
+> **Line 123** This is too informal. The method I usually use is base-related and seems fine in this example. The advantage of `fct_relevel` is not having to name all of them which is useful
+
+```{r}
+GSS <- read.csv("../data/GSScleaned.csv")
+test <- GSS$Opinion.of.family.income
+summary(test)
+test <- factor(test, levels = c("Far above average", "Above average", "Average", "Below Average", "Far below average", "Don't know", "No answer"))
+summary(test)
+```
+
+OUR RESPONSE: This example actually fails because of a small, hard-to-notice typo. Before your code, the total for Below average was 666, after your code it is 0, because the A in Average is not capitalized. This type of error is easy for new users to stumble upon. We've included a modified version of this example in the paper. 
+
+> **Line 138** I would again use the code above instead -- you get a warning but it works.
+
+OUR RESPONSE: The following approach does not work (while generating a `duplicated levels in factors are deprecated` warning): 
+
+```{r, eval=TRUE}
+summary(GSS$Marital.status)
+test <- factor(GSS$Marital.status, levels = c("Single", "Married", "Single", "No Answer", "Single", "Single", NA))
+summary(test)
+```
+
+> **Line 167** Using `parse_number()` in this context seems dangerous. You need to be very sure that the strings with a number have a relevant number. You could accidentally add a number that is not meaningful. How about an example where you have "3 Errors" or something?
+
+OUR RESPONSE: We agree and have incorporated your comments into the paper, after the example.  
+
+> **Code block at line 189** I see why you're sticking with `dplyr` but this code is simpler, I think, with `base`
+
+```r
+HELPsmall <- HELPmiss[,c("i1", "i2", "age")]
+HELPsmall$i1[HELPsmall$id == 1] <- NA
+```
+
+OUR RESPONSE: We agree that there are multiple ways to do this, and we've chosen to stick with the `dplyr` version. 
+
+> **Code block at line 190** Since you're using base, probably replace `tally` with table
+
+OUR RESPONSE: Done
+
+> **Line 103**  "combines the robustnes of the second base R method", not sure what you're referring to.
+
+OUR RESPONSE: We've clarified this in the text: the second approach doesn't use magic column numbers. 
+
+> **Line 201** This sentence is hard to follow consider rewriting.
+
+OUR RESPONSE: We've rewritten the offending sentence and added a second clarifying statement. 
+
