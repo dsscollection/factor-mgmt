@@ -66,26 +66,14 @@ This paper does a great job outlining some of the difficulties with working with
 
 # Responses to questions for reviewers
 
-1. Is it useful to demonstrate two ways to do each thing (as long as one isn’t totally stupid)
+1. Is it useful to demonstrate two ways to do each thing (as long as one isn’t totally stupid) -- Definitely, I like presenting both ways.
 
-Definitely, I like presenting both ways.
+2. Do we clarify why each of the tasks are hard? -- I'm not sure what this question means. Do you mean why these tasks are hard due to R's treatment of factors, or why in general data wrangling is hard? Either way, I think the paper clarifies why these tasks are important, but I'm not sure about "hard".
 
-2. Do we clarify why each of the tasks are hard?
+3. Do we clarify why each of the standard approaches are error-prone? -- Yes, especially the reordering factor levels section gives makes a good case about this.
 
-I'm not sure what this question means. Do you mean why these tasks are hard due to R's treatment of factors, or why in general data wrangling is hard? Either way, I think the paper clarifies why these tasks are important, but I'm not sure about "hard".
+4. Should we focus more on missing values? less? -- I don't think more emphasis on missing values is needed since they are not specific to categorical data.
 
-3. Do we clarify why each of the standard approaches are error-prone?
+5. Add appendices or online resources for other examples? Move closing exercise to be online only? -- I suggest providing the GSS data among online resources so that all examples in the paper can be reproduced by the reader.
 
-Yes, especially the reordering factor levels section gives makes a good case about this.
-
-4. Should we focus more on missing values? less?
-
-I don't think more emphasis on missing values is needed since they are not specific to categorical data.
-
-5. Add appendices or online resources for other examples? Move closing exercise to be online only?
-
-I suggest providing the GSS data among online resources so that all examples in the paper can be reproduced by the reader.
-
-6. Add other references?
-
-The paper indeed is a bit light on references compared to most journal articles. That being said, it doesn't read like it's not grounded in literature, so I don't think references need to be added just for the sake of adding references. 
+6. Add other references? -- The paper indeed is a bit light on references compared to most journal articles. That being said, it doesn't read like it's not grounded in literature, so I don't think references need to be added just for the sake of adding references. 
