@@ -1,6 +1,6 @@
 This paper does a great job outlining some of the difficulties with working with categorical data, specifically factors, in R. Below I provide overall comments on the paper as well as line-by-line comments on the text (many of which are minor issues). Responses to the questions to reviewers are also included at the end of the review.
 
-# Overall comments
+## Overall comments
 
 - I think the paper would benefit from a brief discussion on how R's handling of factors makes it difficult for new learners. While all the examples you showcase in the paper address important issues, I can see an expert R user suggesting that they have just as robust ways of solving these problems using base R only. However for a new learner a robust base R method is likely to have a much steeper learning curve than the tidyverse method. I think this is a big selling point for the tidyverse method, especially within the context of teaching.
 - I suggest dropping the "so-called" in front of tidyverse, unless this is some commonly agreed upon phrasing that I am unaware of.
@@ -9,7 +9,7 @@ This paper does a great job outlining some of the difficulties with working with
 - The defensive coding section could benefit from a discussion on why both assertthat and testthat packages are useful. Is there functionality in one package that is not in the other? If so, the examples should reflect this. If not, and both are showcased just to provide alternatives, it would be a good idea to mention this. Also, I believe the assertions are often used within functions, but the example given here is not within a function. Why would someone not just use "length(levels(drinkstat))==3", which would give TRUE/FALSE, but instead put this within the assert_that function? It would be useful to spell out the reason for the reader.
 - The tone is a bit too colloquial at times. I think the paper would benefit from reading over once more and making edits specifically to address this.
 
-# Line-by-line specific comments
+## Line-by-line comments
 
 - Line 16: Erronous ? in front of "FitzJohn" in the citation reference
 - Line 17-18: "because so many variables are categorical": I understand the sentiment here but this phrasing sounds a bit odd. 
@@ -64,7 +64,7 @@ This paper does a great job outlining some of the difficulties with working with
 - Line 235-236: "Aspects of data wrangling involving categorical variables can be problematic and error-prone." = "Aspects of data wrangling in R involving categorical variables can be problematic and error-prone." (since the discussion in this paper is about doing this in R, not other languages/packages)
 - Line 238: "tidyverse mini-language of R": I like the term "mini-language", but is that commonly used?
 
-# Responses to questions for reviewers
+## Responses to questions for reviewers
 
 1. Is it useful to demonstrate two ways to do each thing (as long as one isn’t totally stupid) -- Definitely, I like presenting both ways.
 
