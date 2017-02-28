@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 > This paper does a great job outlining some of the difficulties with working with categorical data, specifically factors, in R. Below I provide overall comments on the paper as well as line-by-line comments on the text (many of which are minor issues). Responses to the questions to reviewers are also included at the end of the review.
 
-OUR RESPONSE: Thanks for the comments! 
+OUR RESPONSE: Thanks for the positive feedback!
 
 ## Overall comments
 
@@ -28,12 +28,12 @@ OUR RESPONSE: We've added a list of a few packages.
 
 > Changing the labels of factor levels: Compact but fragile base R example uses a different variable than the robust but verbose base R and Direct and robust dplyr. It would make sense to use the same example for showcasing all three approaches.
 
-OUR RESPONSE: XX
+OUR RESPONSE: XX AM to address?
 
 
 > The defensive coding section could benefit from a discussion on why both assertthat and testthat packages are useful. Is there functionality in one package that is not in the other? If so, the examples should reflect this. If not, and both are showcased just to provide alternatives, it would be a good idea to mention this. Also, I believe the assertions are often used within functions, but the example given here is not within a function. Why would someone not just use "length(levels(drinkstat))==3", which would give TRUE/FALSE, but instead put this within the assert_that function? It would be useful to spell out the reason for the reader.
 
-OUR RESPONSE: XX
+OUR RESPONSE: XX 
 
 > The tone is a bit too colloquial at times. I think the paper would benefit from reading over once more and making edits specifically to address this.
 
@@ -48,39 +48,39 @@ OUR RESPONSE: Fixed
 
 > Line 17-18: "because so many variables are categorical": I understand the sentiment here but this phrasing sounds a bit odd. 
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've deleted "so".
 
 > Line 45-49: Peng 2015 also mentions an important reason why factors exist in the first place -- usage of categorial variables in regression models. I think it's important to mention this reason here to provide a reason for why one might want to store their categorical variables as factors.
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've added a phrase about the use of factors in regression models.
 
 > Line 56: "unfortunate behavior of factors in base R": I suggest removing "base" from this phrase as factors behave the same in base R and in tidyverse. The difference is in the syntax of wrangling the factors, but not in how a factor variable behaves.
 
-OUR RESPONSE: XX
+OUR RESPONSE: Fixed.
 
 > Line 56-60: "online movement": I believe I know what you're referring to here but I find it odd to refer to it as such in a journal article without providing background as to what is meant by an online movement. Also, I think it would be worthwhile to briefly explain what the readr package does (provides functions for importing and exporting data) so that it's clear it is during the import/export stage that strings are kept as is. I would also suggest citing the package here.
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've cited Peng's paper.  XX NEED TO CITE READR? XX
 
 > Line 61: It's unclear which storage issues have been solved and how they have been solved.
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've addressed this (see response to Hadley's comments).
 
 > Line 67-68: The ordering of the levels could also be important for interpretability of model results when this variable is an explanatory variable in a multiple linear regression setting.
 
-OUR RESPONSE: XX
+OUR RESPONSE: XX AM to address.
 
 > Line 87: "It had 9 factor levels." = "It is a categorical variable with nine levels."
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've made this change.
 
 > Line 89-90: "changing the text of one (or more) factor labels, so it appears" = "changing the text of factor labels, so they appear" 
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've made this change.
 
 > Line 90: This would be relevant in a ggplot2 plot or a base plot. I suggest just referring to a plot, as opposed to specifically a ggplot2 plot.
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've made this change.
 
 > Line 97: tick after k should be ', not `
 
@@ -100,7 +100,7 @@ OUR RESPONSE: We have replaced the more colloquial "throw an error" with "genera
 
 > Line 112: "vector function" = "vectorized function"
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've made this change.
 
 > Line 115-117: Nice example! It would be nice to line number the code chunks so that you can refer to the trailing space with a line number.
 
@@ -108,7 +108,7 @@ OUR RESPONSE: XX
 
 > Line 130: "whitespace an `Below" = "whitespace and `Below" (missing d in and)
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've made this change.
 
 > Line 132-135 + following code chunk: This example touches upon an important mistake, but it's not only relevant to wrangling categorical data hence I think it should be removed.
 
@@ -120,27 +120,26 @@ OUR RESPONSE: XX
 
 > Line 147: Consider removing referring to forcats as a "new addition" since by the time this is published it might not be as new anymore.
 
-OUR RESPONSE: XX
+OUR RESPONSE: Fixed.
 
 > Line 151: I am not sure calling working in the console an "interactive session" is accurate --- ***COLIN***
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've elided the mention of the console.
 
 > Line 166: `stringsasfactors=FALSE` = `stringsAsFactors = FALSE` (capitalization and spaces)
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've made this change.
 
 > Line 167: "final category containing the lumped remainder of people" = "final category that lumps the remainder of people into one" (or some other phrasing, "lumped remainder" sounds awkward)
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've made this change.
 
 > Line 185: "two category factor" = "two level factor"
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've made this change.
 
 >Line 187: Would one really write a function for this? If the idea is to have a helper function for such a task I would imagine the number 65 would be an argument for that function. Otherwise, if this is a one time task, I doubt many people would functionalize this task. What was the reason for presenting this task as a function followed by sapply?
 	- Also, "x<65" = "x < 65"
-
 
 OUR RESPONSE: XX
 
@@ -159,11 +158,11 @@ OUR RESPONSE: XX
 
 > Line 200: "women, or men" = "women or men"
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've fixed this.
 
 > Line 205: It sounds awkward to refer to people as "alcohol-involved", is this a technical term?
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've rewritten the sentence to avoid the use of "alcohol-involved" and instead describe them as having alcohol as their primary substance of abuse.
 
 > Code chunk following Line 212: 
 	- "id==1" = "id == 1"
@@ -215,7 +214,7 @@ OUR RESPONSE: XX
 
 > Line 238: "tidyverse mini-language of R": I like the term "mini-language", but is that commonly used?
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've dropped the mini-language reference.
 
 ## Responses to questions for reviewers
 

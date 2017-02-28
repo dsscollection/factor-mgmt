@@ -34,21 +34,22 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 
 \section*{Introduction}
 
-Wrangling skills provide an intellectual and practical foundation for data science. Careless data derivation operations can lead to errors or inconsistencies in analysis~\citep{HerMur2015, FitzPen2014}. The wrangling of categorical data presents particular challenges and is highly relevant because so many variables are categorical (e.g., gender, income bracket, U.S. state) but coded with numerical values. It is easy to break the relationship between category numbers and category labels without realizing it, thus losing the information encoded in a variable. If data sources change upstream (for example, if a domain expert is providing spreadsheet data at regular intervals), code that worked on the initial data may not generate an error message, but could silently produce incorrect results.  
+Wrangling skills provide an intellectual and practical foundation for data science. Careless data derivation operations can lead to errors or inconsistencies in analysis~\citep{HerMur2015, FitzPen2014}. The wrangling of categorical data presents particular challenges and is highly relevant because many variables are categorical (e.g., gender, income bracket, U.S. state) but coded with numerical values. It is easy to break the relationship between category numbers and category labels without realizing it, thus losing the information encoded in a variable. If data sources change upstream (for example, if a domain expert is providing spreadsheet data at regular intervals), code that worked on the initial data may not generate an error message, but could silently produce incorrect results.  
 
 Statistical and data science tools need to foster good practice and provide a robust environment for data wrangling and data management.  This paper focuses on how \proglang{R} deals with categorical data, and showcases best practices for categorical data manipulation in \proglang{R} to produce reproducible workflows. We consider a number of common idioms related to categorical data that arise frequently in data cleaning and preparation, propose some guidelines for defensive coding, and discuss settings where analysts often get tripped up when working with categorical data. 
 
 For example, data ingested into \proglang{R} from spreadsheets can lead to problems with categorical data because of the different storage methods possible in both \proglang{R} and the spreadsheets themselves~\citep{WilBry2016}. The examples below will help flag when these issues arise or avoid them altogether. 
 
-To ground our work, we will compare and contrast how categorical data are treated in \pkg{base} \proglang{R} versus the tidyverse~\citep{Wic2014, Wic2016b}. Tools from the tidyverse, discussed in another paper in this special issue (see https://github.com/dsscollection/tidyflow), are designed to make analysis purer, more predictable, and pipeable. Key components of the tidyverse that we will address in this paper include \pkg{ggplot2}, \pkg{dplyr}, \pkg{tidyr}, \pkg{forcats}, and \pkg{readr}. This suite of packages help facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015}. While \proglang{R} code written in \pkg{base} can also have this quality, a common tendency is to use line or column numbers in code, which makes the result less reproducible. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).  These issues are even more salient for new users.
+To ground our work, we will compare and contrast how categorical data are treated in \pkg{base} \proglang{R} versus the tidyverse~\citep{Wic2014, Wic2016b}. Tools from the tidyverse, discussed in another paper in this special issue (see https://github.com/dsscollection/tidyflow), are designed to make analysis purer, more predictable, and pipeable. Key components of the tidyverse that we will address in this paper include \pkg{ggplot2}, \pkg{dplyr}, \pkg{tidyr}, \pkg{forcats}, and \pkg{readr}. This suite of packages help facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015}. While \proglang{R} code written in \pkg{base} can also have this quality, a common tendency is to use row or column numbers in code, which makes the result less reproducible. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).  These issues are even more salient for new users.
 
 
-\section*{Categorical data in R- factors and strings}
+\section*{Categorical data in R: factors and strings}
 Consider a variable describing gender including categories \verb#male#, \verb#female# and \verb#non-conforming#. In \proglang{R}, there are two ways to store this information. One is to use a series of \emph{character strings}, and the other is to store it as a \emph{factor}. 
 
-In early versions of \proglang{R}, storing categorical data as a factor variable was considerably more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015, Lum2015}. However, \proglang{R} uses hashed versions of all character strings, so the storage is now less of an issue~\citep{Pen2015}. For historical (or possibly anachronistic) reasons, many functions store variables by default as factors.
+In early versions of \proglang{R}, storing categorical data as a factor variable was considerably more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015, Lum2015}. However, \proglang{R} uses a global string pool, so each unique string is only stored once, so the storage is now less of an issue~\citep{Pen2015}. For historical (or possibly anachronistic) reasons, many functions store variables by default as factors.
 
-Factors can be tricky to deal with, since many operations applied to them return different values than when applied to character vectors.  As an example, consider a set of decades,
+While factors are important when including categorical variables in regression models, they
+can be tricky to deal with, since many operations applied to them return different values than when applied to character vectors.  As an example, consider a set of decades,
 
 <<>>=
 x1 <- c(10, 10, 20, 20, 40)
@@ -67,7 +68,7 @@ as.numeric(c("hello"))
 as.numeric(factor(c("hello")))
 @
 
-The unfortunate behavior of factors in base \proglang{R} has led to an online movement against the default behavior of many data import functions to make factors out of any variable composed as strings \citep{Pen2015}. The tidyverse is part of this movement, with functions from the \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their startup commands.)
+The unfortunate behavior of factors in \proglang{R} has led to an online movement against the default behavior of many data import functions to make factors out of any variable composed as strings \citep{Pen2015}. The tidyverse is part of this movement, with functions from the \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their startup commands.)
 
 Although the storage issues have been solved, and there are problems with defaulting strings to factors, factors are still necessary for some data analytic tasks. The most salient case is in modeling. When you pass a factor variable into \verb#lm()# or \verb#glm()#, \proglang{R} automatically creates indicator (or more colloquially `dummy') variables for each of the levels and picks one as a reference group. For simple cases, this behavior can also be achieved with a character vector. However, to choose which level to use as a reference level or to order classes, factors must be used. Text strings \verb#low, medium, high# would not preserve the ordering inherent in the groups. Again, this can be important for modeling when doing ordinal logistic regression and multinomial logistic regression. 
 
@@ -94,9 +95,9 @@ The remainder of this paper is organized around case studies (examples) to carry
 Each case study begins with a problem, and presents several solutions. Typically, we contrast a method that uses the functionality of \pkg{base} \proglang{R} functions with an approach from the tidyverse along with some annotations of the code as needed. We will argue that while both approaches can solve the problem, the tidyverse solution tends to be simpler, easier to learn, and more robust. 
 
 \section*{Changing the labels of factor levels}
-In our first example, we will be considering the labor status variable. It has \Sexpr{length(levels(GSS$Labor.force.status))} factor levels. Most of the labels are spelled out fully, but a few are strangely formatted. We want to change this. 
+In our first example, we will be considering the labor status variable. It is a categorical variable with \Sexpr{length(levels(GSS$Labor.force.status))} levels. Most of the labels are spelled out fully, but a few are strangely formatted. We want to change this. 
 
-This is a specific case of the more general problem of changing the text of one (or more) of the factor labels, so it appears more nicely formatted in a \pkg{ggplot2} plot, for example.
+This is a specific case of the more general problem of changing the text of factor labels, so they appear more nicely formatted in a plot, for example.
 
 There are two typical approaches in \pkg{base} \proglang{R}. One is more compact, but depends on the levels of the factor not changing in the data being fed in, and the other is more robust, but extremely verbose. In contrast, the \pkg{dplyr} package offers a more human readable method, while also supporting reproducibility. 
 
@@ -116,9 +117,16 @@ levels(GSS$Labor.force.status) <- c(levels(GSS$Labor.force.status)[1:5],
 summary(GSS$Labor.force.status)
 @
 
-This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k' comes first in the alphabet. If the data gets changed outside of R, for example so responses currently labeled ``Working full time'' get labeled ``Full time work'', the code will not generate an error message, but will mislabel all the data such that the `Labor.force.status` variable is essentially meaningless. 
+This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. We call this a \emph{fragile} process since future datasets may cause a workflow to break (a related concept in computer science is \emph{software brittleness}).  Why is this fragile?  By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k' comes first in the alphabet. If the data gets changed outside of R, for example so responses currently labeled ``Working full time'' get labeled ``Full time work'', the code will not generate an error message, but will mislabel all the data such that the `Labor.force.status' variable is essentially meaningless.  (Another possible issue arises with strings that include non-ASCII characters, where the default of order levels may vary from locale to locale.)
 
 The workflow will also fail if additional factor levels are added after the fact. In our experience, both with students and scientific collaborators, spreadsheet data can be easily changed in these ways. Others have noted this concern~\citep{Lee2016}. 
+
+On a similar note, 
+the following code silently makes a missing value.
+<<>>=
+factor("a", levels="c")
+@
+
 
 \subsection*{Robust but verbose (base R)}
 Another (more robust method) to recode this variable in \pkg{base} \proglang{R} is to use subsetting to overwrite particular values in the data. 
@@ -141,7 +149,7 @@ This second approach is more robust, because if the labels or ordering of levels
 
 \subsection*{Direct and robust (dplyr)}
 
-The \verb#recode()# function in the \pkg{dplyr} package is a vector function, which combines the robustness of the second base R approach while also reducing the verbosity. It still suffers from the problem of misspelling and cut-and-paste errors, because it will not generate an error message if you try to recode a non-existent level. 
+The \verb#recode()# function in the \pkg{dplyr} package is a vectorized function, which combines the robustness of the second base R approach while also reducing the verbosity. It still suffers from the problem of misspelling and cut-and-paste errors, because it will not generate an error message if you try to recode a non-existent level. 
 <<>>=
 GSS <- GSS %>% 
   mutate(dplyrParty =  
@@ -152,7 +160,7 @@ GSS <- GSS %>%
            `Not str democrat` = "Not a strong democrat"))
 summary(GSS$dplyrParty)
 @
-In the above example, notice the trailing space in \verb#`Not str republican `# in the \verb#recode()# call. Because of this typo (the original factor level is actually \verb#`Not str republican`#), the original factor level persists after the recode. 
+In the above example, notice the trailing space in \verb#`Not str republican `# in the \verb#recode()# call. Because of this typo (the original factor level is actually \verb#`Not str republican'#), the original factor level persists after the recode. 
 
 \subsection*{Aside -- Editing whitespace out of levels}
 
@@ -181,9 +189,9 @@ test <- factor(test, levels = c("Far above average", "Above average", "Average "
 summary(test)
 @
 
-Note that many of the category totals come through appropriately, but several totals get set to 0 (`Average` because of the trailing whitespace an `Below Average` because of the mistaken capitalization). These errors can be exceedingly frustrating to troubleshoot. 
+Note that many of the category totals come through appropriately, but several totals get set to 0 (`Average' because of the trailing whitespace and `Below Average' because of the mistaken capitalization). These errors can be exceedingly frustrating to troubleshoot. 
 
-An approach that looks similar upon inspection but actually performs quite differently is to overwrite the `levels()` of the factor outside the `factor()` command. It is tempting for new analysts to write code such as the following, which completely breaks the association between rows and factor labels the data set.
+An approach that looks similar upon inspection but actually performs quite differently is to overwrite the `levels()' of the factor outside the `factor()' command. It is tempting for new analysts to write code such as the following, which completely breaks the association between rows and factor labels the data set.
 <<>>=
 test <- GSS$Opinion.of.family.income
 summary(test)
@@ -204,7 +212,7 @@ levels(GSS$Opinion.of.family.income)
 
 This is both verbose and depends on the number and order of the levels staying the same. If another factor level is added to the dataset, the above code will generate an error message because the number of levels differs. This example illustrates why it is sometimes dangerous to replace an old version of a data frame with a new version.
 
-Even worse, if the code gets run more than once, the order will be broken. Particularly when working interactively in the console, this is all too easy to do. 
+Even worse, if the code gets run more than once, the order will be broken. Particularly when working interactively, this is all too easy to do. 
 
 <<>>=
 levels(GSS$Opinion.of.family.income) <- 
@@ -215,7 +223,7 @@ levels(GSS$Opinion.of.family.income)
 The more times the code is run, the worse it gets. 
 
 \subsection*{Robust method}
-Because of the fragility and potential for frustration and mistakes associated with reordering levels in base R, we recommend the use of a tidyverse package. A new addition to the tidyverse is the package \pkg{forcats}, a package for categorical data (and, the name is an anagram of the word factors!)~\citep{Wic2016}. \pkg{forcats} includes a \verb#fct_relevel()# function that does exactly what we want. It allows us to specify the order of our factor levels (either completely or partially) and is robust to re-running code in an interactive session. 
+Because of the fragility and potential for frustration and mistakes associated with reordering levels in base R, we recommend the use of a tidyverse package. The package \pkg{forcats} (where the name is an anagram of the word factors!)~\citep{Wic2016}. \pkg{forcats} is included in the tidyverse.  It includes a \verb#fct_relevel()# function that does exactly what we want. It allows us to specify the order of our factor levels (either completely or partially) and is robust to re-running code in an interactive session. 
 <<>>=
 # devtools::install_github("hadley/forcats")
 library(forcats)
@@ -274,7 +282,7 @@ levels(GSS$Race.of.respondent)
 
 
 \subsection*{Combining numeric-type levels}
-Combining numeric-type levels is a frequently-occurring problem even when \verb#stringsasfactors=FALSE#. Often variables like age or income are right-censored, so there is a final category containing the lumped remainder of people. This means the data is necessarily at least a character string if not a factor. However, it may be more natural to work with numeric expressions when recoding this data. 
+Combining numeric-type levels is a frequently-occurring problem even when \verb#stringsAsFactors = FALSE#. Often variables like age or income are right-censored, so there is a final category that lumps the remainder of people into one group. This means the data is necessarily at least a character string if not a factor. However, it may be more natural to work with numeric expressions when recoding this data. 
 
 In this data, age is provided as an integer for respondents 18-88, but also includes the possible answer ``89 or older'' as well as a possible ``No answer'' and NA values. 
 
@@ -294,7 +302,7 @@ GSS$BaseAge <- as.numeric(as.character(GSS$BaseAge))
 summary(GSS$BaseAge)
 @
 
-We're avoiding the pitfall from the introduction here by not simply using \verb#as.numeric()# on the factor variables (this would convert 18 to 1, 19 to 2, etc.). And of course, we're cheating a little bit here-- if we were going to use this as a numeric variable in an analysis, we wouldn't necessarily want to turn all the ``89 or older" cases into the number ``89". But, we're on our way to a two-category factor, so those cases would have gone to the ``65 and up" category one way or the other.
+We're avoiding the pitfall from the introduction here by not simply using \verb#as.numeric()# on the factor variables (this would convert 18 to 1, 19 to 2, etc.). And of course, we're cheating a little bit here-- if we were going to use this as a numeric variable in an analysis, we wouldn't necessarily want to turn all the ``89 or older" cases into the number ``89". But, we're on our way to a two level factor, so those cases would have gone to the ``65 and up" category one way or the other.
 
 Now, we can write some conditional logic
 <<>>=
@@ -322,9 +330,9 @@ Note that you need to be very sure that the strings with a number have a relevan
 
 \section*{Creating derived categorical variable}
 Challenges often arise when data scientists need to create derived categorical variables.  As an example, consider an indicator of moderate drinking status. The National Institutes of Alcohol Abuse and Alcoholism have published guidelines for moderate drinking \cite{rethinkdrink}. 
-These guidelines state that women, or men aged 65 or older should drink no more than one drink per day on average and no more than three drinks on any single day or at a sitting.
+These guidelines state that women (or men aged 65 or older) should drink no more than one drink per day on average and no more than three drinks on any single day or at a sitting.
 Men under age 65 should drink no more than two drinks per day on average and no more than four drinks on any single day.
-The {\tt HELPmiss} dataset from the \pkg{mosaicData} package includes baseline data from a randomized clinical trial (Health Evaluation and Linkage to Primary Care) \cite{same:lars:hort:2003}.  These subjects were recruited from a detoxification center, hence those that are alcohol-involved have extremely high rates of drinking.
+The {\tt HELPmiss} dataset from the \pkg{mosaicData} package includes baseline data from a randomized clinical trial (Health Evaluation and Linkage to Primary Care) \cite{same:lars:hort:2003}.  These subjects were recruited from a detoxification center, hence those that reported alcohol as their primary substance of abuse have extremely high rates of drinking.
 
 
 \begin{tabular}{l|l}
@@ -359,7 +367,7 @@ head(HELPsmall, 2)
 # create empty repository for new variable
 drinkstat <- character(length(HELPsmall$i1))
 # create abstinent group
-drinkstat[HELPsmall$i1==0] = "abstinent"
+drinkstat[HELPsmall$i1==0] <- "abstinent"
 # create moderate group
 drinkstat[(HELPsmall$i1>0 & HELPsmall$i1<=1 & 
    HELPsmall$i2<=3 & HELPsmall$sex=="female") |
@@ -375,14 +383,15 @@ drinkstat <- factor(drinkstat)
 table(drinkstat, useNA = "always")
 @
 
-While this approach works, it is hard to follow or to debug. The logical conditions are all correctly coded, but require many repetitions of \verb#HELPsmall$variable#, and the missing value was not handled by default (without the \verb#is.na()# call, the missing value would default to be \verb#"highrisk"# because of their extreme value for \verb#i2#). 
+While this approach works, it is hard to follow and to check or debug. The logical conditions are all correctly coded, but require many repetitions of \verb#HELPsmall$variable#, and the missing value was not handled by default (without the \verb#is.na()# call, the missing value would default to be \verb#"highrisk"# because of their extreme value for \verb#i2#). 
 
 
 \subsection*{Robust method (dplyr)}
 <<>>=
 HELPsmall <- with(HELPsmall,  # this won't work with current dplyr
   # unless HELPsmall is made accessible to mutate() through with()
-  # Hadley is aware of this issue with case_when()
+  # Hadley was aware of this issue with case_when(), though the issue is closed at
+  # https://github.com/hadley/dplyr/issues/1996
   mutate(HELPsmall,        
     drink_stat = case_when(
       i1 == 0 ~ "abstinent",
@@ -426,30 +435,20 @@ expect_equivalent(levels(GSS$Race.of.respondent), sort(c("Nonwhite", "White")))
 
 \section*{Conclusion}
 
-Categorical variables arise commonly in surveys and observational data.  Aspects of data wrangling involving categorical variables can be problematic and error-prone.  In this paper we have outlined some example case studies where analytic tasks can be simplified and made more robust through use of new tools available in the tidyverse mini-language of \proglang{R}. We believe further work is needed to continue to make it easier to undertake analyses requiring data wrangling (particularly with respect to categorical data). New tools and an increased emphasis on defensive coding may help improve the quality of data science moving 
-forward.
+Categorical variables arise commonly in most datasets.  Aspects of data wrangling involving categorical variables can be problematic and error-prone.  In this paper we have outlined some example case studies where analytic tasks can be simplified and made more robust through use of new tools available in the tidyverse. We believe further work is needed to continue to make it easier to undertake analyses requiring data wrangling (particularly with respect to categorical data). New tools and an increased emphasis on defensive coding may help improve the quality of data science moving forward.
 
 \section*{Acknowledgements}
 
-Thanks to Hadley Wickham, who read an early version of this paper and helped solve several issues with the \pkg{forcats} package. 
+Thanks to Hadley Wickham, Colin Rundel, and Zev Ross for helpful comments and suggestions on 
+an earlier draft.
 
-
-\section*{Queries for reviewers}
-\begin{enumerate}
-\item Is it useful to demonstrate two ways to do each thing (as long as one isn't totally stupid)
-\item Do we clarify why each of the tasks are hard?
-\item Do we clarify why each of the standard approaches are error-prone?
-\item Should we focus more on missing values?  less?
-\item Add appendices  or online resources for other examples?  Move closing exercise to be online only?
-\item Add other references?
-\end{enumerate}
 
 \appendix
 
 \section*{Appendix A: Loading the data}\label{load}
-Since this is a reproducible special issue, we want to make sure our data ingest process is as reproducible as possible. We are using the General Social Survey (GSS) data, which includes many years of data (1972-2014) and many possible variables (150-800 variables, depending on the year)~\citep{GSS2016}. However, the GSS data has some idiosyncrasies. So, we are attempting good-enough practices for data ingest~\citep{WilBry2016}.
+Since this is a reproducible special issue, we want to make sure our data ingestation process is as reproducible as possible. We are using the General Social Survey (GSS) data, which includes many years of data (1972-2014) and many possible variables (150-800 variables, depending on the year)~\citep{GSS2016}. However, the GSS data has some idiosyncrasies. So, we are attempting good-enough practices for data ingest~\citep{WilBry2016}.
 
-The most major issue related to reproducibility is the data is not available through an API. For SPSS and Stata users, yearly data are available for direct download on the website. For more format possibilities, users must go through an online wizard to select variables and years for the data they wish to download~\citep{GSS2016b}. For this paper, we selected a subset of the demographic variables and the year 2014. The possible output options from the wizard are Excel (either data and metadata or metadata only), SPSS, SAS, Stata, DDI, or R script. We selected both the Excel and R formats to look at the differences. 
+The major issue related to reproducibility is the fact that the dataset is not available through an API. For SPSS and Stata users, yearly data are available for direct download on the website. For more format possibilities, users must go through an online wizard to select variables and years for the data they wish to download~\citep{GSS2016b}. For this paper, we selected a subset of the demographic variables and the year 2014. The possible output options from the wizard are Excel (either data and metadata or metadata only), SPSS, SAS, Stata, DDI, or R script. We selected both the Excel and R formats to look at the differences. 
 
 The R format provided by the GSS is actually a Stata file and custom R script  using the \pkg{foreign} package to do the translation for you. Here is the result of that process.
 
@@ -488,11 +487,12 @@ With the data loaded and the names adjusted, we can write the data to a new file
 library(readr)
 write_csv(GSS, path="../data/GSScleaned.csv")
 @
+A version of this file is used as our motivating example.
 
 \section*{Appendix B: Closing exercise}
-We have included the following as a possible closing exercise.
+We have included the following as a possible supplementary exercise.
 
-Subjects in the HELP study were also categorized into categories of drug and alcohol involvement, as displayed in the following table.
+Subjects in the HELP study were also categorized into categories of primary and secondary drug and alcohol involvement, as displayed in the following table.
 
 <<>>=
 HELPbase <- HELPfull %>%
@@ -515,9 +515,9 @@ value&description \\ \hline
 8&Opiates \\ \hline
 \end{tabular}
 
-Create a new variable called `primsub` combining the primary and secondary substances into a categorical variable with values corresponding to primary and secondary substances of the form: {\tt alcohol only}, {\tt cocaine only}, `heroin only`, `alcohol-cocaine`, `cocaine-alcohol`, or `other`.  Code any group with fewer than 5 entries as `alcohol-other`, `cocaine-other`, or `heroin-other`.  If `PRIM\_SUB==6` make the `primsub` variable missing.
+Create a new variable called `primsub' combining the primary and secondary substances into a categorical variable with values corresponding to primary and secondary substances of the form: {\tt alcohol only}, {\tt cocaine only}, `heroin only', `alcohol-cocaine', `cocaine-alcohol', or `other'.  Code any group with fewer than 5 entries as `alcohol-other', `cocaine-other', or `heroin-other'.  If `PRIM\_SUB==6' make the `primsub' variable missing.
 
-How many subjects are there in the `alcohol-none` group?  How many subjects are there in the `alcohol-other` group?  What are the three most common groups?
+How many subjects are there in the `alcohol-none' group?  How many subjects are there in the `alcohol-other' group?  What are the three most common groups?
 
 SOLUTION:
 <<>>=
