@@ -12,13 +12,13 @@
 \author[1]{Amelia McNamara}
 \author[2]{Nicholas J Horton}
 \affil[1]{Statistical and Data Sciences Program, Smith College}
-\affil[2]{Mathematics and Statistics Department, Amherst College}
+\affil[2]{Department of Mathematics and Statistics, Amherst College}
 
 
 \keywords{statistical computing; data derivation; data science; data management}
 
 \begin{abstract}
-Data wrangling is a critical foundation of data science, and wrangling of categorical data is an important component of this process. However, categorical data can introduce unique issues in data wrangling, particularly in real-world settings with collaborators and periodically-updated data. This paper discusses common problems arising from categorical variable transformations in R, as well as potential solutions to the problems. For each problem, we present at least two strategies for management, one in base R and the other from the `tidyverse.' We consider several motivating examples, suggest defensive coding strategies, and outline principles for data wrangling to help ensure data quality and sound analysis.
+Data wrangling is a critical foundation of data science, and wrangling of categorical data is an important component of this process. However, categorical data can introduce unique issues in data wrangling, particularly in real-world settings with collaborators and periodically-updated dynamic data. This paper discusses common problems arising from categorical variable transformations in R, demonstrate the use of factors, and suggest approaches to address data wrangling challenges. For each problem, we present at least two strategies for management, one in base R and the other from the `tidyverse.' We consider several motivating examples, suggest defensive coding strategies, and outline principles for data wrangling to help ensure data quality and sound analysis.
 \end{abstract}
 
 \begin{document}
@@ -34,19 +34,19 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 
 \section*{Introduction}
 
-Wrangling skills provide an intellectual and practical foundation for data science. Careless data derivation operations can lead to errors or inconsistencies in analysis~\citep{HerMur2015, FitzPen2014}. The wrangling of categorical data presents particular challenges and is highly relevant because so many variables are categorical (e.g., gender, income bracket, U.S. state). For example, it is easy to break the relationship between category numbers and category labels without realizing it, thus losing the information encoded in a variable. If data changes upstream (for example, if a domain expert is providing spreadsheet data at regular intervals), code that worked on the initial data may not throw errors, but could produce incorrect results.  
+Wrangling skills provide an intellectual and practical foundation for data science. Careless data derivation operations can lead to errors or inconsistencies in analysis~\citep{HerMur2015, FitzPen2014}. The wrangling of categorical data presents particular challenges and is highly relevant because so many variables are categorical (e.g., gender, income bracket, U.S. state) but coded with numerical values. It is easy to break the relationship between category numbers and category labels without realizing it, thus losing the information encoded in a variable. If data sources change upstream (for example, if a domain expert is providing spreadsheet data at regular intervals), code that worked on the initial data may not generate an error message, but could silently produce incorrect results.  
 
-It's important that statistical and data science tools foster good practice and provide a robust environment for data wrangling and data management.  This paper focuses on how \proglang{R} deals with categorical data, and showcases best practices for categorical data manipulation in \proglang{R} to produce reproducible workflows. We consider a number of common idioms related to categorical data that arise frequently in data cleaning and preparation, propose some guidelines for defensive coding, and discuss settings where analysts often get tripped up when working with categorical data. 
+Statistical and data science tools need to foster good practice and provide a robust environment for data wrangling and data management.  This paper focuses on how \proglang{R} deals with categorical data, and showcases best practices for categorical data manipulation in \proglang{R} to produce reproducible workflows. We consider a number of common idioms related to categorical data that arise frequently in data cleaning and preparation, propose some guidelines for defensive coding, and discuss settings where analysts often get tripped up when working with categorical data. 
 
 For example, data ingested into \proglang{R} from spreadsheets can lead to problems with categorical data because of the different storage methods possible in both \proglang{R} and the spreadsheets themselves~\citep{WilBry2016}. The examples below will help flag when these issues arise or avoid them altogether. 
 
-To ground our work, we will compare and contrast how categorical data are treated in \pkg{base} \proglang{R} versus the tidyverse~\citep{Wic2014, Wic2016b}. Tools from the tidyverse, discussed in another paper in this special issue (see https://github.com/dsscollection/tidyflow), are designed to make analysis purer, more predictable, and pipeable. The packages in the tidyverse are ever-growing, but include \pkg{ggplot2}, \pkg{dplyr}, \pkg{tidyr}, \pkg{forcats}, and \pkg{readr}. These packages help facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015}. While \proglang{R} code written in \pkg{base} can also have this quality, a common tendency is to use line or column numbers in code, which makes the result less reproducible. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).
+To ground our work, we will compare and contrast how categorical data are treated in \pkg{base} \proglang{R} versus the tidyverse~\citep{Wic2014, Wic2016b}. Tools from the tidyverse, discussed in another paper in this special issue (see https://github.com/dsscollection/tidyflow), are designed to make analysis purer, more predictable, and pipeable. Key components of the tidyverse that we will address in this paper include \pkg{ggplot2}, \pkg{dplyr}, \pkg{tidyr}, \pkg{forcats}, and \pkg{readr}. This suite of packages help facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015}. While \proglang{R} code written in \pkg{base} can also have this quality, a common tendency is to use line or column numbers in code, which makes the result less reproducible. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).  These issues are even more salient for new users.
 
 
 \section*{Categorical data in R- factors and strings}
-Consider a variable describing gender including categories \verb#male#, \verb#female# and \verb#non-conforming#. In \proglang{R}, there are two ways to store this information. One is to use a series of character strings, and the other is to store it as a factor. 
+Consider a variable describing gender including categories \verb#male#, \verb#female# and \verb#non-conforming#. In \proglang{R}, there are two ways to store this information. One is to use a series of \emph{character strings}, and the other is to store it as a \emph{factor}. 
 
-Historically, storing categorical data as a factor variable was considerably more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015, Lum2015}. However, \proglang{R} uses hashed versions of all character strings, so the storage is less of an issue~\citep{Pen2015}. For historical (or possibly anachronistic) reasons, many functions store variables by default as factors.
+In early versions of \proglang{R}, storing categorical data as a factor variable was considerably more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015, Lum2015}. However, \proglang{R} uses hashed versions of all character strings, so the storage is now less of an issue~\citep{Pen2015}. For historical (or possibly anachronistic) reasons, many functions store variables by default as factors.
 
 Factors can be tricky to deal with, since many operations applied to them return different values than when applied to character vectors.  As an example, consider a set of decades,
 
@@ -60,30 +60,30 @@ ds <- ds %>%
 ds
 @
 
-Instead of creating a new variable with a numeric version of the value of the factor variable \verb#x1f# the variable is created with a factor number (i.e., 10 is mapped to 1, 20 is mapped to 2, and 40 is mapped to 3). This result is unexpected because \verb#base::as.numeric()# is intended to recover numeric information by coercing a character variable. Compare the following:
+Instead of creating a new variable with a numeric version of the value of the factor variable \verb#x1f#, the variable is created with a factor number (i.e., 10 is mapped to 1, 20 is mapped to 2, and 40 is mapped to 3). This result is unexpected because \verb#base::as.numeric()# is intended to recover numeric information by coercing a character variable. Compare the following:
 
 <<>>=
 as.numeric(c("hello"))
 as.numeric(factor(c("hello")))
 @
 
-The unfortunate behavior of factors in base \proglang{R} has led to an online movement against the default behavior of many data import functions to take any variable composed as strings and automatically convert the variable to a factor. The tidyverse is part of this movement, with functions from the \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their startup commands.)
+The unfortunate behavior of factors in base \proglang{R} has led to an online movement against the default behavior of many data import functions to make factors out of any variable composed as strings \citep{Pen2015}. The tidyverse is part of this movement, with functions from the \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their startup commands.)
 
 Although the storage issues have been solved, and there are problems with defaulting strings to factors, factors are still necessary for some data analytic tasks. The most salient case is in modeling. When you pass a factor variable into \verb#lm()# or \verb#glm()#, \proglang{R} automatically creates indicator (or more colloquially `dummy') variables for each of the levels and picks one as a reference group. For simple cases, this behavior can also be achieved with a character vector. However, to choose which level to use as a reference level or to order classes, factors must be used. Text strings \verb#low, medium, high# would not preserve the ordering inherent in the groups. Again, this can be important for modeling when doing ordinal logistic regression and multinomial logistic regression. 
 
-While factors are important, they can often be hard to deal with. Because of the way the group numbers are stored separately from the factor labels, it can be easy to overwrite data in such a way that the original data are lost. In this paper, we will suggest best practices for working with factor data. 
+While factors are important, they can often be hard to deal with. Because of the way the group numbers are stored separately from the factor labels, it can be easy to overwrite data in such a way that the original data are lost. They present a steep learning curve for new users.  In this paper, we will suggest best practices for working with factor data. 
 
 To motivate this process, we will consider data from the General Social Survey~\citep{GSS2016}. The General Social Survey is a product of the National Data Program for the Social Sciences, and the survey has been conducted since 1972 by NORC at the University of Chicago. It contains data on many factors of social life, and is widely used by social scientists. (In this paper we consider data from 2014.)
 
-There are some import issues inherent to the data which are not particular to categorical data (see Appendix A for details). We'll work with the data with cleaned variable names.
+There are some import issues inherent to the data which are not particular to categorical data (see Appendix A for details). We'll work with the data with slightly cleaned up variable names.
 
 <<>>=
 library(dplyr)
-GSS <- read.csv("../data/GSScleaned.csv")
+GSS <- read.csv("../data/GSSoriginal.csv")
 glimpse(GSS)
 @
 
-The remainder of this paper is organized around case studies (examples) related to particular tasks:
+The remainder of this paper is organized around case studies (examples) to carry out four specific and useful tasks:
 \begin{enumerate}
 \item Changing the labels of factor levels,
 \item Reordering factor levels,
@@ -91,7 +91,7 @@ The remainder of this paper is organized around case studies (examples) related 
 \item Making derived factor variables.
 \end{enumerate}
 
-Each case study begins with a problem, and presents several solutions. Typically, a method using only \pkg{base} \proglang{R} functions is contrasted with an approach from the tidyverse with some annotations of the code as needed. We will argue the tidyverse solution is more robust. 
+Each case study begins with a problem, and presents several solutions. Typically, we contrast a method that uses the functionality of \pkg{base} \proglang{R} functions with an approach from the tidyverse along with some annotations of the code as needed. We will argue that while both approaches can solve the problem, the tidyverse solution tends to be simpler, easier to learn, and more robust. 
 
 \section*{Changing the labels of factor levels}
 In our first example, we will be considering the labor status variable. It has \Sexpr{length(levels(GSS$Labor.force.status))} factor levels. Most of the labels are spelled out fully, but a few are strangely formatted. We want to change this. 
@@ -116,7 +116,7 @@ levels(GSS$Labor.force.status) <- c(levels(GSS$Labor.force.status)[1:5],
 summary(GSS$Labor.force.status)
 @
 
-This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k' comes first in the alphabet. If the data gets changed outside of R, for example so responses currently labeled ``Working full time'' get labeled ``Full time work'', the code will not throw errors, but will mislabel all the data such that the `Labor.force.status` variable is essentially meaningless. 
+This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k' comes first in the alphabet. If the data gets changed outside of R, for example so responses currently labeled ``Working full time'' get labeled ``Full time work'', the code will not generate an error message, but will mislabel all the data such that the `Labor.force.status` variable is essentially meaningless. 
 
 The workflow will also fail if additional factor levels are added after the fact. In our experience, both with students and scientific collaborators, spreadsheet data can be easily changed in these ways. Others have noted this concern~\citep{Lee2016}. 
 
@@ -141,7 +141,7 @@ This second approach is more robust, because if the labels or ordering of levels
 
 \subsection*{Direct and robust (dplyr)}
 
-The \verb#recode()# function in the \pkg{dplyr} package is a vector function, which combines the robustness of the second base R approach while also reducing the verbosity. It still suffers from the problem of misspelling and cut-and-paste errors, because it will not throw errors if you try to recode a non-existent level. 
+The \verb#recode()# function in the \pkg{dplyr} package is a vector function, which combines the robustness of the second base R approach while also reducing the verbosity. It still suffers from the problem of misspelling and cut-and-paste errors, because it will not generate an error message if you try to recode a non-existent level. 
 <<>>=
 GSS <- GSS %>% 
   mutate(dplyrParty =  
@@ -202,7 +202,7 @@ levels(GSS$Opinion.of.family.income) <-
 levels(GSS$Opinion.of.family.income)
 @
 
-This is both verbose and depends on the number and order of the levels staying the same. If another factor level is added to the dataset, the above code will throw an error because the number of levels differs. This example illustrates why it is sometimes dangerous to replace an old version of a data frame with a new version.
+This is both verbose and depends on the number and order of the levels staying the same. If another factor level is added to the dataset, the above code will generate an error message because the number of levels differs. This example illustrates why it is sometimes dangerous to replace an old version of a data frame with a new version.
 
 Even worse, if the code gets run more than once, the order will be broken. Particularly when working interactively in the console, this is all too easy to do. 
 
