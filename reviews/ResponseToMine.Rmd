@@ -15,7 +15,7 @@ OUR RESPONSE: Thanks for the positive feedback!
 
 >  I think the paper would benefit from a brief discussion on how R's handling of factors makes it difficult for new learners. While all the examples you showcase in the paper address important issues, I can see an expert R user suggesting that they have just as robust ways of solving these problems using base R only. However for a new learner a robust base R method is likely to have a much steeper learning curve than the tidyverse method. I think this is a big selling point for the tidyverse method, especially within the context of teaching.
 
-OUR RESPONSE: We've added this point in two places in the introduction XX and XX.
+OUR RESPONSE: We've added this point in the introduction. 
 
 
 >  I suggest dropping the "so-called" in front of tidyverse, unless this is some commonly agreed upon phrasing that I am unaware of.
@@ -29,6 +29,20 @@ OUR RESPONSE: We've added a list of a few packages.
 > Changing the labels of factor levels: Compact but fragile base R example uses a different variable than the robust but verbose base R and Direct and robust dplyr. It would make sense to use the same example for showcasing all three approaches.
 
 OUR RESPONSE: XX AM to address?
+
+I'm struggling with this. I know in other places we have saved the variable as a new object so we don't overwrite anything in the original data, but I like how the repeated dollar signs appear here. This doesn't have the same feeling: 
+
+```{r, eval=FALSE}
+laborForce <- GSS$Labor.force.status
+levels(laborForce) <- c(levels(laborForce)[1:5], 
+                             "Temporarily not working", 
+                             "Unemployed, laid off", 
+                             "Working full time", 
+                             "Working part time")
+summary(laborForce)
+```
+
+I've edited the examples to all use the laborForce status but do slightly different changes. 
 
 
 > The defensive coding section could benefit from a discussion on why both assertthat and testthat packages are useful. Is there functionality in one package that is not in the other? If so, the examples should reflect this. If not, and both are showcased just to provide alternatives, it would be a good idea to mention this. Also, I believe the assertions are often used within functions, but the example given here is not within a function. Why would someone not just use "length(levels(drinkstat))==3", which would give TRUE/FALSE, but instead put this within the assert_that function? It would be useful to spell out the reason for the reader.
@@ -68,7 +82,7 @@ OUR RESPONSE: We've addressed this (see response to Hadley's comments).
 
 > Line 67-68: The ordering of the levels could also be important for interpretability of model results when this variable is an explanatory variable in a multiple linear regression setting.
 
-OUR RESPONSE: XX AM to address.
+OUR RESPONSE: Thanks for this, we've changed the modeling section to more explicitly reference linear regression. 
 
 > Line 87: "It had 9 factor levels." = "It is a categorical variable with nine levels."
 
@@ -88,11 +102,11 @@ OUR RESPONSE: Fixed
 
 > Line 99: Labor.force.status variable should be in monospace font
 
-OUR RESPONSE: XX
+OUR RESPONSE: Fixed
 
 >  Note: It seems like none of the inline code is formatted properly, e.g.  Line 127. This might be a global setting issue in the Rnw document.
 
-OUR RESPONSE: XX
+OUR RESPONSE: I think this was related to moving from Rmd to Rnw. Should be fixed now. 
 
 > Line 99: "throw error" - I think the verb "throw" comes from other languages, like C# or JavaScript. I have not heard it used within the context of R, is this common?
 
@@ -116,7 +130,7 @@ OUR RESPONSE: XX
 
 > Line 144: The order is broken the second time this piece of code is run, I don't think it's accurate to say it gets worse. 
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've changed this to ``the more mixed up the labels and observations get''
 
 > Line 147: Consider removing referring to forcats as a "new addition" since by the time this is published it might not be as new anymore.
 
@@ -141,7 +155,7 @@ OUR RESPONSE: We've made this change.
 >Line 187: Would one really write a function for this? If the idea is to have a helper function for such a task I would imagine the number 65 would be an argument for that function. Otherwise, if this is a one time task, I doubt many people would functionalize this task. What was the reason for presenting this task as a function followed by sapply?
 	- Also, "x<65" = "x < 65"
 
-OUR RESPONSE: XX
+OUR RESPONSE: Looking at this code, it's hard to remember why it got written this way! We agree that it's a strange way to solve the problem, and have removed the function and sapply. 
 
 
 > Line 194-195: I don't follow what this warning is saying, can you clarify? Or maybe give an example?
@@ -150,7 +164,7 @@ OUR RESPONSE: XX
 
 > Line 196: "Variable" = "Variables" (plural sounds more appropriate in a section title)
 
-OUR RESPONSE: XX
+OUR RESPONSE: Fixed
 
 > Line 199 and Line 204: Is there a typo in how the citation is displayed?
 
