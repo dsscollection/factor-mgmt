@@ -191,21 +191,23 @@ Again, there is a fragile way to reorder the factor levels in base R, and a more
 One common way to make this sort of change is to pass an argument to \verb#levels# within the \verb#factor()# function. However, this is fragile with respect to spelling issues and trailing whitespace. 
 
 <<>>=
-test <- GSS$Opinion.of.family.income
-summary(test)
-test <- factor(test, levels = c("Far above average", "Above average", "Average ", "Below Average", "Far below average", "Don't know", "No answer"))
-summary(test)
+famIncome <- GSS$Opinion.of.family.income
+summary(famIncome)
+test <- factor(famIncome, levels = c("Far above average", "Above average", "Average ",
+                                     "Below Average", "Far below average", "Don't know",
+                                     "No answer"))
+summary(famIncome)
 @
 
 Note that many of the category totals come through appropriately, but several totals get set to 0 (`Average' because of the trailing whitespace and `Below Average' because of the mistaken capitalization). These errors can be exceedingly frustrating to troubleshoot. 
 
 An approach that looks similar upon inspection but actually performs quite differently is to overwrite the \verb#levels()# of the factor outside the \verb#factor()# command. It is tempting for new analysts to write code such as the following, which completely breaks the association between rows and factor labels the data set.
 <<>>=
-test <- GSS$Opinion.of.family.income
-summary(test)
-levels(test) <- c("Far above average", "Above average", "Average", "Below Average", 
+famIncome <- GSS$Opinion.of.family.income
+summary(famIncome)
+levels(famIncome) <- c("Far above average", "Above average", "Average", "Below Average", 
   "Far below average", "Don't know", "No answer")
-summary(test)
+summary(famIncome)
 @
 
 An approach that will not suffer from spelling mistakes is to use numeric indexing the reorder the levels. 
@@ -444,8 +446,7 @@ Categorical variables arise commonly in most datasets.  Aspects of data wranglin
 
 \section*{Acknowledgements}
 
-Thanks to Hadley Wickham, Colin Rundel, and Zev Ross for helpful comments and suggestions on 
-an earlier draft.
+Thanks to Hadley Wickham, Mine Cetinkaya-Rundel, Colin Rundel, and Zev Ross for helpful comments and suggestions on an earlier draft.
 
 
 \appendix
