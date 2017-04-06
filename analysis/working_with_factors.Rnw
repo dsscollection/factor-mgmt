@@ -124,7 +124,7 @@ levels(GSS$Labor.force.status) <- c(levels(GSS$Labor.force.status)[1:5],
 summary(GSS$Labor.force.status)
 @
 
-This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. We call this a \emph{fragile} process since future datasets may cause a workflow to break (a related concept in computer science is \emph{software brittleness}).  Why is this fragile?  By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k' comes first in the alphabet. If the data gets changed outside of R, for example so responses currently labeled ``Working full time'' get labeled ``Full time work'', the code will not generate an error message, but will mislabel all the data such that the \verb#Labor.force.status# variable is essentially meaningless.  (Another possible issue arises with strings that include non-ASCII characters, where the default of order levels may vary from locale to locale.)
+This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. We call this a \emph{fragile} process since future datasets may cause a workflow to break (a related concept in computer science is \emph{software brittleness}). XX NH citation. Why is this fragile?  By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k' comes first in the alphabet. If the data gets changed outside of R, for example so responses currently labeled ``Working full time'' get labeled ``Full time work'', the code will not generate an error message, but will mislabel all the data such that the \verb#Labor.force.status# variable is essentially meaningless.  (Another possible issue arises with strings that include non-ASCII characters, where the default of order levels may vary from locale to locale.)
 
 The workflow will also fail if additional factor levels are added after the fact. In our experience, both with students and scientific collaborators, spreadsheet data can be easily changed in these ways. Others have noted this concern~\citep{Lee2016}. 
 
@@ -400,7 +400,7 @@ HELPsmall <- HELPsmall %>%
     i1 <= 1 & i2 <= 3 & sex == 'female' ~ "moderate",
     i1 <= 1 & i2 <= 3 & sex == 'male' & age >= 65 ~ "moderate",
     i1 <= 2 & i2 <= 4 & sex == 'male' ~ "moderate",
-    is.na(i1) ~ "missing",  # this can't be NA
+    is.na(i1) ~ "missing",  # can't put NA in place of "missing"
     TRUE ~ "highrisk"
 ))
 tally( ~ drink_stat, exclude=NULL, data = HELPsmall)

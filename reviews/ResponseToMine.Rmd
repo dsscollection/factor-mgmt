@@ -204,10 +204,9 @@ OUR RESPONSE: XX
 	- Add whitespaces around == for sex variable
 	- "this can't be NA": Why not?
 	- `tally` is a mosaic function, not dplyr. Since this section is the dplyr section I think it would be more appropriate to use something like HELPsmall %>% count(drink_stat)
-
-OUR RESPONSE: XX
 	
-OUR RESPONSE: Please note that we're now running the development version of dplyr that has the fix for the problem with case_when. We added spaces around all double equals in the paper. 
+OUR RESPONSE: Please note that we're now running the development version of dplyr that has the fix for the problem with `case_when()`. We added spaces around all double equals in the paper. We've changed "this can't be NA" to "can't put NA in place of "missing"" Is it possible to set things to missing in `case_when()`? We don't see a way to do that. When we try, we get the error message `RHS of case 5 (NA): must be type character, not logical`. 
+XX NH re: tally()
 	
 > Line 222: What do you mean by "harder to miss possible edge cases"?
 
@@ -215,7 +214,7 @@ OUR RESPONSE: XX
 
 > Code chunk following Line 230: "length(levels(drinkstat))==3" = "length(levels(drinkstat)) == 3" (whitspaces around ==)
 
-OUR RESPONSE: XX
+OUR RESPONSE: Fixed
 
 > Code chunk following Line 233: 
 	- Will the comments about the code that doesn't work be removed? If not, what is the benefit of keeping them in?
