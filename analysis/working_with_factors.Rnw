@@ -394,20 +394,18 @@ While this approach works, it is hard to follow and to check or debug. The logic
 
 \subsection*{Robust method (dplyr)}
 <<>>=
-HELPsmall <- with(HELPsmall,  # this won't work with current dplyr
-  # unless HELPsmall is made accessible to mutate() through with()
-  # Hadley was aware of this issue with case_when(), though the issue is closed at
-  # https://github.com/hadley/dplyr/issues/1996
-  mutate(HELPsmall,        
-    drink_stat = case_when(
-      i1 == 0 ~ "abstinent",
-      i1 <= 1 & i2 <= 3 & sex == 'female' ~ "moderate",
-      i1 <= 1 & i2 <= 3 & sex == 'male' & age >= 65 ~ "moderate",
-      i1 <= 2 & i2 <= 4 & sex == 'male' ~ "moderate",
-      is.na(i1) ~ "missing",  # this can't be NA
-      TRUE ~ "highrisk"
-)))
+HELPsmall <- HELPsmall %>%
+  mutate(drink_stat = case_when(
+    i1 == 0 ~ "abstinent",
+    i1 <= 1 & i2 <= 3 & sex == 'female' ~ "moderate",
+    i1 <= 1 & i2 <= 3 & sex == 'male' & age >= 65 ~ "moderate",
+    i1 <= 2 & i2 <= 4 & sex == 'male' ~ "moderate",
+    is.na(i1) ~ "missing",  # this can't be NA
+    TRUE ~ "highrisk"
+))
 tally( ~ drink_stat, exclude=NULL, data = HELPsmall)
+
+# XX NH HELPsmall %>% count(drink_stat)
 @
 
 In the robust tidyverse method, the same logic is used, but the conditions are clearer and more comprehensible.  Instead of one complex Boolean condition for \verb#moderate#, three separate lines can be used to match the different options. While the end result is the same, this code is more human readable and it is harder to miss possible edge cases. 
