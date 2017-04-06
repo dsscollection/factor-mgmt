@@ -8,3 +8,4 @@
 .syntax.gz
 .tex
 cache/
+.DS_Store

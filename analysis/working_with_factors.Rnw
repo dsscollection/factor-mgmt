@@ -126,7 +126,7 @@ Another (more robust method) to recode this variable in \pkg{base} \proglang{R} 
 <<>>=
 summary(GSS$Political.party.affiliation)
 GSS$NewParty <- as.character(GSS$Political.party.affiliation)
-GSS$NewParty[GSS$Political.party.affiliation=="Ind,near dem"] <- 
+GSS$NewParty[GSS$Political.party.affiliation == "Ind,near dem"] <- 
   "Independent, near democrat"
 GSS$NewParty[GSS$Political.party.affiliation == "Ind,near rep"] <- 
   "Independent, near republican"
@@ -348,7 +348,7 @@ Because missing values can become especially problematic in more complex derivat
 <<>>=
 data(HELPmiss)
 HELPsmall <- HELPmiss %>%
-  mutate(i1 = ifelse(id==1, NA, i1)) %>%  # make one value missing
+  mutate(i1 = ifelse(id == 1, NA, i1)) %>%  # make one value missing
   select(sex, i1, i2, age)
 head(HELPsmall, 2)
 @
@@ -359,15 +359,15 @@ head(HELPsmall, 2)
 # create empty repository for new variable
 drinkstat <- character(length(HELPsmall$i1))
 # create abstinent group
-drinkstat[HELPsmall$i1==0] = "abstinent"
+drinkstat[HELPsmall$i1 == 0] = "abstinent"
 # create moderate group
 drinkstat[(HELPsmall$i1>0 & HELPsmall$i1<=1 & 
-   HELPsmall$i2<=3 & HELPsmall$sex=="female") |
-  (HELPsmall$i1>0 & HELPsmall$i1<=2 & 
-   HELPsmall$i2<=4 & HELPsmall$sex=="male")] = "moderate"
+   HELPsmall$i2<=3 & HELPsmall$sex == "female") |
+  (HELPsmall$i1>0 & HELPsmall$i1 <= 2 & 
+   HELPsmall$i2<=4 & HELPsmall$sex == "male")] = "moderate"
 # create highrisk group
-drinkstat[((HELPsmall$i1>1 | HELPsmall$i2>3) & HELPsmall$sex=="female") |
-  ((HELPsmall$i1>2 | HELPsmall$i2>4) & HELPsmall$sex=="male")] = "highrisk"
+drinkstat[((HELPsmall$i1>1 | HELPsmall$i2>3) & HELPsmall$sex == "female") |
+  ((HELPsmall$i1>2 | HELPsmall$i2>4) & HELPsmall$sex == "male")] = "highrisk"
 # account for missing values
 is.na(drinkstat) <- is.na(HELPsmall$i1) | is.na(HELPsmall$i2) | 
   is.na(HELPsmall$sex)
@@ -386,9 +386,9 @@ HELPsmall <- with(HELPsmall,  # this won't work with current dplyr
   mutate(HELPsmall,        
     drink_stat = case_when(
       i1 == 0 ~ "abstinent",
-      i1 <= 1 & i2 <= 3 & sex=='female' ~ "moderate",
-      i1 <= 1 & i2 <= 3 & sex=='male' & age >= 65 ~ "moderate",
-      i1 <= 2 & i2 <= 4 & sex=='male' ~ "moderate",
+      i1 <= 1 & i2 <= 3 & sex == 'female' ~ "moderate",
+      i1 <= 1 & i2 <= 3 & sex == 'male' & age >= 65 ~ "moderate",
+      i1 <= 2 & i2 <= 4 & sex == 'male' ~ "moderate",
       is.na(i1) ~ "missing",  # this can't be NA
       TRUE ~ "highrisk"
 )))
@@ -407,7 +407,7 @@ the drinking status variable in the HELP dataset. If there were fewer or more th
 <<>>=
 library(assertthat)
 levels(drinkstat)
-assert_that(length(levels(drinkstat))==3)
+assert_that(length(levels(drinkstat)) == 3)
 @
 
 We also might want to ensure the factor labels are exactly what we were expecting. Perhaps we want to make sure our Race variable has been collapsed into two categories, with particular levels. We can use \verb#expect_equivalent()# and \verb#expect_equal()# from the \pkg{testthat} package to make this check. 
@@ -496,7 +496,7 @@ Subjects in the HELP study were also categorized into categories of drug and alc
 
 <<>>=
 HELPbase <- HELPfull %>%
-  filter(TIME==0)
+  filter(TIME == 0)
 tally( ~ PRIM_SUB + SECD_SUB, data=HELPbase)
 @
 
@@ -515,7 +515,7 @@ value&description \\ \hline
 8&Opiates \\ \hline
 \end{tabular}
 
-Create a new variable called `primsub` combining the primary and secondary substances into a categorical variable with values corresponding to primary and secondary substances of the form: {\tt alcohol only}, {\tt cocaine only}, `heroin only`, `alcohol-cocaine`, `cocaine-alcohol`, or `other`.  Code any group with fewer than 5 entries as `alcohol-other`, `cocaine-other`, or `heroin-other`.  If `PRIM\_SUB==6` make the `primsub` variable missing.
+Create a new variable called `primsub` combining the primary and secondary substances into a categorical variable with values corresponding to primary and secondary substances of the form: {\tt alcohol only}, {\tt cocaine only}, `heroin only`, `alcohol-cocaine`, `cocaine-alcohol`, or `other`.  Code any group with fewer than 5 entries as `alcohol-other`, `cocaine-other`, or `heroin-other`.  If `PRIM\_SUB == 6` make the `primsub` variable missing.
 
 How many subjects are there in the `alcohol-none` group?  How many subjects are there in the `alcohol-other` group?  What are the three most common groups?
 
@@ -561,17 +561,17 @@ merged <- with(merged,
   mutate(merged,
     title = 
       case_when(
-        observed < 5 & primary=="alcohol" ~ "alcohol-other",
-        observed < 5 & primary=="cocaine" ~ "cocaine-other",
-        observed < 5 & primary=="heroin" ~ "heroin-other",
+        observed < 5 & primary == "alcohol" ~ "alcohol-other",
+        observed < 5 & primary == "cocaine" ~ "cocaine-other",
+        observed < 5 & primary == "heroin" ~ "heroin-other",
         TRUE ~ title),
-    title = ifelse(primary=="marijuana", NA, title)))
+    title = ifelse(primary == "marijuana", NA, title)))
 tally(~ title + observed, data=merged)
 @
 
 <<>>=
-tally(~ title=="alcohol-none", data=merged)
-tally(~ title=="alcohol-other", data=merged)
+tally(~ title == "alcohol-none", data=merged)
+tally(~ title == "alcohol-other", data=merged)
 sort(tally(~ title, data=merged), decreasing=TRUE)[1:3]
 @
 
