@@ -267,7 +267,7 @@ summary(GSS$Opinion.of.family.income)
 \section*{Combining several levels into one}
 
 \subsection*{Combining discrete levels}
-This is another common task. Maybe you want fewer coefficients in your model, or the data-generating process makes a finer distinction between categories than your research. For whatever the reason, you want to group together levels that are currently separate. 
+This is another common task. Maybe you want fewer coefficients in your model, or the data-generating process makes a finer distinction between categories than your research. For whatever the reason, you want to group together levels that are currently separate.
 
 \subsubsection*{Fragile method (base R)}
 This method overwrites the labels of factor levels with repeated labels in order to group levels together. 
@@ -281,7 +281,7 @@ summary(GSS$Labor.force.status)
 As before, this is fragile because it depends on the order of the factor levels not changing, and on a human accurately counting the indices of all the levels they wish to change. 
 
 \subsubsection*{Robust method}
-The \verb#recode()# does what we want. 
+The \verb#recode()# function does what we want, this time for an example using race/ethnicity.
 <<>>=
 levels(GSS$Race.of.respondent)
 GSS <- GSS %>% 
