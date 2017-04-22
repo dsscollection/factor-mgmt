@@ -70,7 +70,7 @@ as.numeric(c("hello"))
 as.numeric(factor(c("hello")))
 @
 
-The unfortunate behavior of factors in \proglang{R} has led to an online movement against the default behavior of many data import functions to make factors out of any variable composed as strings \citep{Pen2015}. The tidyverse is part of this movement, with functions from the \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their startup commands.)
+The unfortunate behavior of factors in \proglang{R} has led to an online movement against the default behavior of many data import functions to make factors out of any variable composed as strings \citep{Pen2015,readr}. The tidyverse is part of this movement, with functions from the \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their startup commands.)
 
 Although the storage issues have been solved, and there are problems with defaulting strings to factors, factors are still necessary for some data analytic tasks. The most salient case is in modeling. When you pass a factor variable into \verb#lm()# or \verb#glm()#, \proglang{R} automatically creates indicator (or more colloquially `dummy') variables for each of the levels and picks one as a reference group. 
 
@@ -83,7 +83,7 @@ While factors are important, they can often be hard to deal with. Because of the
 
 To motivate this process, we will consider data from the General Social Survey~\citep{GSS2016}. The General Social Survey is a product of the National Data Program for the Social Sciences, and the survey has been conducted since 1972 by NORC at the University of Chicago. It contains data on many factors of social life, and is widely used by social scientists. (In this paper we consider data from 2014.)
 
-There are some import issues inherent to the data which are not particular to categorical data (see Appendix A for details). We'll work with the data with slightly cleaned up variable names.
+There are some import issues inherent to the data which are not particular to categorical data (see Supplementary Appendix A for details). We'll work with the data with slightly cleaned up variable names.
 
 <<>>=
 library(dplyr)
@@ -172,7 +172,8 @@ In the above example, notice the trailing space in \verb#`Temporarily not workin
 
 \subsection*{Aside -- Editing whitespace out of levels}
 
-Whitespace can be dealt with when data is read, or later using string manipulations. This can be done using the \verb#trimws()# function  in \pkg{base} \proglang{R}. 
+A more general problem sometimes arises due to extra spaces included when data are ingested.
+Such whitespace can be dealt with when data is read, or addressed later using string operations. This latter approach can be carried out using the \verb#trimws()# function  in \pkg{base} \proglang{R}. 
 <<>>=
 gender <- factor(c("male ", "male  ", "male    ", "male"))
 levels(gender)
@@ -328,7 +329,7 @@ The \pkg{dplyr} method follows similar logic. However, instead of explicitly ove
 library(readr)
 GSS <- GSS %>%
   mutate(dplyrAge = parse_number(Age.of.respondent)) %>%
-  mutate(dplyrAge = if_else(dplyrAge < 65, "18-65", "65 and up"),
+  mutate(dplyrAge = ifelse(dplyrAge < 65, "18-65", "65 and up"),
          dplyrAge = factor(dplyrAge))
 summary(GSS$dplyrAge)
 @
@@ -336,10 +337,10 @@ summary(GSS$dplyrAge)
 Note that you need to be very sure that the strings with a number have a relevant number. You could accidentally add a number that is not meaningful if numbers appear in unanticipated ways. 
 
 \section*{Creating derived categorical variables}
-Challenges often arise when data scientists need to create derived categorical variables.  As an example, consider an indicator of moderate drinking status. The National Institutes of Alcohol Abuse and Alcoholism have published guidelines for moderate drinking \cite{rethinkdrink}. 
+Challenges often arise when data scientists need to create derived categorical variables.  As an example, consider an indicator of moderate drinking status. The National Institutes of Alcohol Abuse and Alcoholism have published guidelines for moderate drinking \citep{rethinkdrink}. 
 These guidelines state that women (or men aged 65 or older) should drink no more than one drink per day on average and no more than three drinks on any single day or at a sitting.
 Men under age 65 should drink no more than two drinks per day on average and no more than four drinks on any single day.
-The {\tt HELPmiss} dataset from the \pkg{mosaicData} package includes baseline data from a randomized clinical trial (Health Evaluation and Linkage to Primary Care) \cite{same:lars:hort:2003}.  These subjects were recruited from a detoxification center, hence those that reported alcohol as their primary substance of abuse have extremely high rates of drinking.
+The {\tt HELPmiss} dataset from the \pkg{mosaicData} package includes baseline data from randomized Health Evaluation and Linkage to Primary Care (HELP) clinical trial \citep{same:lars:hort:2003}.  These subjects for the sutdy were recruited from a detoxification center, hence those that reported alcohol as their primary substance of abuse have extremely high rates of drinking.
 
 
 \begin{tabular}{l|l}
@@ -354,8 +355,9 @@ age&age (in years) \\ \hline
 These guidelines can be used to create a new variable called {\tt abstinent} for those reporting no drinking based on the value of their {\tt i1} variable and {\tt moderate} for those that do not exceed the NIAAA guidelines, with all other non-missing values coded as {\tt highrisk}.
 
 <<>>=
-library(dplyr)
 library(mosaic)
+library(mosaicData)
+library(dplyr)
 library(readr)
 @
 
@@ -371,25 +373,25 @@ head(HELPsmall, 2)
 \subsection*{Fragile method (base R)}
 
 <<>>=
-# create empty repository for new variable
+# create empty vector for new variable
 drinkstat <- character(length(HELPsmall$i1))
 # create abstinent group
 drinkstat[HELPsmall$i1 == 0] = "abstinent"
 # create moderate group
-drinkstat[(HELPsmall$i1>0 & HELPsmall$i1<=1 & 
-   HELPsmall$i2<=3 & HELPsmall$sex == "female") |
-  (HELPsmall$i1>0 & HELPsmall$i1 <= 2 & 
-   HELPsmall$i2<=4 & HELPsmall$sex == "male")] = "moderate"
+drinkstat[(HELPsmall$i1>0 & HELPsmall$i1<=1 &   # find those with moderate levels
+   HELPsmall$i2 <= 3 & HELPsmall$sex == "female") |
+  (HELPsmall$i1 > 0 & HELPsmall$i1 <= 2 & 
+   HELPsmall$i2 <= 4 & HELPsmall$sex == "male")] = "moderate"
 # create highrisk group
-drinkstat[((HELPsmall$i1>1 | HELPsmall$i2>3) & HELPsmall$sex == "female") |
-  ((HELPsmall$i1>2 | HELPsmall$i2>4) & HELPsmall$sex == "male")] = "highrisk"
+drinkstat[((HELPsmall$i1 > 1 | HELPsmall$i2 > 3) & HELPsmall$sex == "female") |
+  ((HELPsmall$i1 > 2 | HELPsmall$i2 > 4) & HELPsmall$sex == "male")] = "highrisk"
 # account for missing values
 is.na(drinkstat) <- is.na(HELPsmall$i1) | is.na(HELPsmall$i2) | 
   is.na(HELPsmall$sex)
 drinkstat <- factor(drinkstat)
 table(drinkstat, useNA = "always")
 @
-While this approach works, it is hard to follow and to check or debug. The logical conditions are all correctly coded, but require many repetitions of \verb#HELPsmall$variable#, and the missing value was not handled by default (without the \verb#is.na()# call, the missing value would default to be \verb#"highrisk"# because of their extreme value for \verb#i2#). 
+While this approach works, it is hard to follow, check, or debug. The logical conditions are all correctly coded, but require many repetitions of \verb#HELPsmall$variable#, and the missing value was not handled by default (without the \verb#is.na()# call, the missing value would default to be \verb#"highrisk"# because of the extreme value for \verb#i2# for that subject). 
 
 
 \subsection*{Robust method (dplyr)}
@@ -405,15 +407,18 @@ HELPsmall <- HELPsmall %>%
 ))
 tally( ~ drink_stat, exclude=NULL, data = HELPsmall)
 
-# XX NH HELPsmall %>% count(drink_stat)
+HELPsmall %>%
+  dplyr::count()
 @
 
-In the robust tidyverse method, the same logic is used, but the conditions are clearer and more comprehensible.  Instead of one complex Boolean condition for \verb#moderate#, three separate lines can be used to match the different options. While the end result is the same, this code is more human readable and it is harder to miss possible edge cases. 
+In the robust tidyverse method, the same logic is used, but the conditions are clearer and more comprehensible.  Instead of one complex Boolean condition for \verb#moderate#, three separate lines can be used to match the different options. While the end result is the same, this code is more human readable and it is harder to miss special cases.
 
+An additional example is provided in Supplementary Appendix B.
 
 \section*{Defensive coding}
 
-It is always good practice to code in a defensive manner. Investing a little time up front can help avoid painful errors later. For the setting we are considering, defensive coding might involve adding conditional testing statements into code creating or modifying factors. These testing statements can help ensure the data have not changed from one session to another, or as the result of changes to the raw data. 
+It is always good practice to code in a defensive manner. Investing a little time up front can help avoid painful errors later. For the setting we are considering, defensive coding might involve adding conditional testing statements into code creating or modifying factors. These testing statements (such as those implemented 
+in the \pkg{testthat} and \pkg{assertthat} packages) can help ensure the data have not changed from one session to another, or as the result of changes to the raw data. 
 
 As an example, we might want to check there are exactly three levels for
 the drinking status variable in the HELP dataset. If there were fewer or more than three levels, something would have gone wrong with our code. We can use the \pkg{assertthat} package to help with this. 
@@ -423,23 +428,25 @@ levels(drinkstat)
 assert_that(length(levels(drinkstat)) == 3)
 @
 
-We also might want to ensure the factor labels are exactly what we were expecting. Perhaps we want to make sure our Race variable has been collapsed into two categories, with particular levels. We can use \verb#expect_equivalent()# and \verb#expect_equal()# from the \pkg{testthat} package to make this check. 
+We also might want to ensure the factor labels are exactly what we were expecting. Perhaps we want to make sure our Race variable has been collapsed into two categories, with particular levels. We can use \verb#expect_equivalent()# from the \pkg{testthat} package to make this check. 
 
 <<error = TRUE>>=
 library(testthat)
 str(levels(GSS$Race.of.respondent))
 str(c("White", "Nonwhite"))
 str(sort(c("White", "Nonwhite")))
-#expect_equivalent(levels(GSS$Race.of.respondent), 
-  # c("White", "Nonwhite")) # This doesn't work, but we wish it did.
 expect_equivalent(levels(GSS$Race.of.respondent), c("Nonwhite", "White")) 
-expect_equal(levels(GSS$Race.of.respondent), c("Nonwhite", "White")) 
-expect_equivalent(levels(GSS$Race.of.respondent), sort(c("Nonwhite", "White"))) 
 @
+
+While assertions of this sort are most commonly used to provide error-checking within functions, we believe that they can and should be incorporated into working code.  In this manner they may serve as the basis for a function at some point in the future.
+
+
 
 \section*{Conclusion}
 
-Categorical variables arise commonly in most datasets.  Aspects of data wrangling involving categorical variables can be problematic and error-prone.  In this paper we have outlined some example case studies where analytic tasks can be simplified and made more robust through use of new tools available in the tidyverse. We believe further work is needed to continue to make it easier to undertake analyses requiring data wrangling (particularly with respect to categorical data). New tools and an increased emphasis on defensive coding may help improve the quality of data science moving forward.
+Categorical variables arise commonly in most datasets.  
+Aspects of data wrangling in R involving categorical variables can be problematic and error-prone.
+In this paper we have outlined some example case studies where analytic tasks can be simplified and made more robust through use of new tools available in the tidyverse. We believe further work is needed to continue to make it easier to undertake analyses requiring data wrangling (particularly with respect to categorical data). New tools and an increased emphasis on defensive coding may help improve the quality of data science moving forward.
 
 \section*{Acknowledgements}
 
@@ -448,7 +455,7 @@ Thanks to Hadley Wickham, Mine Cetinkaya-Rundel, Johanna Hardin, Zev Ross, and C
 
 \appendix
 
-\section*{Appendix A: Loading the data}\label{load}
+\section*{Supplementary Appendix A: Loading the data}\label{load}
 Since this is a reproducible special issue, we want to make sure our data ingestation process is as reproducible as possible. We are using the General Social Survey (GSS) data, which includes many years of data (1972-2014) and many possible variables (150-800 variables, depending on the year)~\citep{GSS2016}. However, the GSS data has some idiosyncrasies. So, we are attempting good-enough practices for data ingest~\citep{WilBry2016}.
 
 The major issue related to reproducibility is the fact that the dataset is not available through an API. For SPSS and Stata users, yearly data are available for direct download on the website. For more format possibilities, users must go through an online wizard to select variables and years for the data they wish to download~\citep{GSS2016b}. For this paper, we selected a subset of the demographic variables and the year 2014. The possible output options from the wizard are Excel (either data and metadata or metadata only), SPSS, SAS, Stata, DDI, or R script. We selected both the Excel and R formats to look at the differences. 
@@ -492,7 +499,7 @@ write_csv(GSS, path="../data/GSScleaned.csv")
 @
 A version of this file is used as our motivating example.
 
-\section*{Appendix B: Closing exercise}
+\section*{Supplementary Appendix B: Closing exercise}
 We have included the following as a possible supplementary exercise.
 
 Subjects in the HELP study were also categorized into categories of primary and secondary drug and alcohol involvement, as displayed in the following table.

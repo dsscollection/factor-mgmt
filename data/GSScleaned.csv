@@ -998,7 +998,7 @@ Year,Respondent.id.number,Labor.force.status,Occupational.prestige.score.1970,Ma
 2014,997,Working parttime,0,Divorced,2,75.000000,12,Female,White,Average,$25000 or more,$4000 to 4999,Not applicable,"Ind,near rep",Average,Heterosexual or straight
 2014,998,Retired,0,Never married,1,75.000000,9,Male,Black,Far below average,Don't know,Not applicable,Not applicable,Not str democrat,Average,Heterosexual or straight
 2014,999,Working fulltime,0,Never married,0,53.000000,12,Female,White,Below average,$25000 or more,$25000 or more,Not applicable,Not str republican,Below average,Heterosexual or straight
-2014,1000,Working fulltime,0,Never married,1,56.000000,17,Female,White,Average,$10000 - 14999,$10000 - 14999,Not applicable,"Ind,near rep",Below average,Heterosexual or straight
+2014,1e3,Working fulltime,0,Never married,1,56.000000,17,Female,White,Average,$10000 - 14999,$10000 - 14999,Not applicable,"Ind,near rep",Below average,Heterosexual or straight
 2014,1001,Working fulltime,0,Never married,1,35.000000,13,Male,White,Average,$25000 or more,$25000 or more,Not applicable,Other party,Average,Heterosexual or straight
 2014,1002,Working fulltime,0,Never married,1,23.000000,13,Female,Black,Average,$25000 or more,$20000 - 24999,Not applicable,Not str democrat,Average,Heterosexual or straight
 2014,1003,Working parttime,0,Never married,0,21.000000,12,Male,White,Above average,$10000 - 14999,$5000 to 5999,Not applicable,"Ind,near rep",Average,Heterosexual or straight
@@ -1993,7 +1993,7 @@ Year,Respondent.id.number,Labor.force.status,Occupational.prestige.score.1970,Ma
 2014,1997,Working fulltime,0,Divorced,2,67.000000,12,Female,White,Below average,$25000 or more,$20000 - 24999,Not applicable,Strong democrat,Average,Heterosexual or straight
 2014,1998,Working fulltime,0,Divorced,1,30.000000,15,Female,White,Below average,$25000 or more,$25000 or more,Not applicable,Not str republican,Average,Bisexual
 2014,1999,Working fulltime,0,Never married,0,19.000000,13,Female,White,Average,$25000 or more,$3000 to 3999,Not applicable,"Ind,near dem",Above average,Heterosexual or straight
-2014,2000,Retired,0,Married,2,79.000000,14,Male,White,Average,$25000 or more,Not applicable,Not applicable,Not str republican,Average,Heterosexual or straight
+2014,2e3,Retired,0,Married,2,79.000000,14,Male,White,Average,$25000 or more,Not applicable,Not applicable,Not str republican,Average,Heterosexual or straight
 2014,2001,Working fulltime,0,Divorced,3,33.000000,13,Male,White,Below average,$25000 or more,Not applicable,Not applicable,Not str democrat,Above average,Heterosexual or straight
 2014,2002,Working parttime,0,Widowed,3,75.000000,12,Male,White,Average,$15000 - 19999,$10000 - 14999,Not applicable,Independent,Average,Heterosexual or straight
 2014,2003,Retired,0,Married,2,79.000000,11,Female,White,Below average,$20000 - 24999,Not applicable,Not applicable,Strong republican,Below average,Heterosexual or straight

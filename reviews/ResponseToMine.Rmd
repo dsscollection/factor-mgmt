@@ -47,7 +47,7 @@ I've edited the examples to all use the laborForce status but do slightly differ
 
 > The defensive coding section could benefit from a discussion on why both assertthat and testthat packages are useful. Is there functionality in one package that is not in the other? If so, the examples should reflect this. If not, and both are showcased just to provide alternatives, it would be a good idea to mention this. Also, I believe the assertions are often used within functions, but the example given here is not within a function. Why would someone not just use "length(levels(drinkstat))==3", which would give TRUE/FALSE, but instead put this within the assert_that function? It would be useful to spell out the reason for the reader.
 
-OUR RESPONSE: XX 
+OUR RESPONSE: We have added a discussion of the two packages and mention of the reason why we use them in this code example.
 
 > The tone is a bit too colloquial at times. I think the paper would benefit from reading over once more and making edits specifically to address this.
 
@@ -74,7 +74,7 @@ OUR RESPONSE: Fixed.
 
 > Line 56-60: "online movement": I believe I know what you're referring to here but I find it odd to refer to it as such in a journal article without providing background as to what is meant by an online movement. Also, I think it would be worthwhile to briefly explain what the readr package does (provides functions for importing and exporting data) so that it's clear it is during the import/export stage that strings are kept as is. I would also suggest citing the package here.
 
-OUR RESPONSE: We've cited Peng's paper.  XX NEED TO CITE READR? XX
+OUR RESPONSE: We've cited Peng's paper and the `readr` package.
 
 > Line 61: It's unclear which storage issues have been solved and how they have been solved.
 
@@ -118,7 +118,7 @@ OUR RESPONSE: We've made this change.
 
 > Line 115-117: Nice example! It would be nice to line number the code chunks so that you can refer to the trailing space with a line number.
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've not be able to determine how to make this change: suggestions welcomed.
 
 > Line 130: "whitespace an `Below" = "whitespace and `Below" (missing d in and)
 
@@ -126,7 +126,7 @@ OUR RESPONSE: We've made this change.
 
 > Line 132-135 + following code chunk: This example touches upon an important mistake, but it's not only relevant to wrangling categorical data hence I think it should be removed.
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've added a note that this is a more general problem (but believe that it's useful as an aside).
 
 > Line 144: The order is broken the second time this piece of code is run, I don't think it's accurate to say it gets worse. 
 
@@ -136,7 +136,7 @@ OUR RESPONSE: We've changed this to ``the more mixed up the labels and observati
 
 OUR RESPONSE: Fixed.
 
-> Line 151: I am not sure calling working in the console an "interactive session" is accurate --- ***COLIN***
+> Line 151: I am not sure calling working in the console an "interactive session" is accurate 
 
 OUR RESPONSE: We've elided the mention of the console.
 
@@ -160,7 +160,7 @@ OUR RESPONSE: Looking at this code, it's hard to remember why it got written thi
 
 > Line 194-195: I don't follow what this warning is saying, can you clarify? Or maybe give an example?
 
-OUR RESPONSE: XX
+OUR RESPONSE: XX AM XX to address: I think that this is reference to "Note that you need to be very sure that the strings with a number have a relevant number. You could accidentally add a number that is not meaningful if numbers appear in unanticipated ways."
 
 > Line 196: "Variable" = "Variables" (plural sounds more appropriate in a section title)
 
@@ -168,7 +168,7 @@ OUR RESPONSE: Fixed
 
 > Line 199 and Line 204: Is there a typo in how the citation is displayed?
 
-OUR RESPONSE: XX
+OUR RESPONSE: Fixed.
 
 > Line 200: "women, or men" = "women or men"
 
@@ -182,35 +182,45 @@ OUR RESPONSE: We've rewritten the sentence to avoid the use of "alcohol-involved
 	- "id==1" = "id == 1"
 	- Used if_else in an earlier chunk but ifelse here, would be good to keep those consistent (unless there is a reason not to, which I believe there isn't)
 
-OUR RESPONSE: XX
+OUR RESPONSE: We now use `ifelse` throughout.
 
 > Code chunk following Line 210: Does mosaic also load mosaicData? If not, it should be loaded as well since it's referred to earlier in the text. 
 
-OUR RESPONSE: XX
+OUR RESPONSE: The `mosaic` package also loads `mosaicData`.  But we've added the explicit loading of the package.
 
 > Code chunk following Line 212:
 	- "empty repository" = "empty vector"
 	- Add whitespaces around logical operators, i.e. "==" = " == "
 	- This chunk is quite difficult to follow. I suppose that is the point, so it makes that point very well. But a few comments in especially the moderate section would help readability
 
-OUR RESPONSE: XX
+OUR RESPONSE: Fixed.
 	
 > Line 217: "their extreme value" = "the extreme i2 value for that observation" (or something along these lines, current phrasing made me ask "who are they?")
 
-OUR RESPONSE: XX
+OUR RESPONSE: Fixed.
 
 > Code chunk following Line 218:
 	- Note on case_when: I assume this comment will be removed and code chunk updated? (On a related note I really wish case_when worked like this!)
-	- Add whitespaces around == for sex variable
-	- "this can't be NA": Why not?
-	- `tally` is a mosaic function, not dplyr. Since this section is the dplyr section I think it would be more appropriate to use something like HELPsmall %>% count(drink_stat)
+
+OUR RESPONSE: Please note that we're now running the development version of dplyr that has the fix for the problem with `case_when()`. 
+
+> - Add whitespaces around == for sex variable
+
+OUR RESPONSE: We added spaces around all double equals in the paper. 
+
+> - "this can't be NA": Why not?
+
+OUR RESPONSE: We've changed 'this can't be NA' to 'can't put NA in place of "missing"' Is it possible to set things to missing in `case_when()`? We don't see a way to do that. When we try, we get the error message `RHS of case 5 (NA): must be type character, not logical`. (Perhaps this is something to raise with Hadley.)
+
+> - `tally` is a mosaic function, not dplyr. Since this section is the dplyr section I think it would be more appropriate to use something like HELPsmall %>% count(drink_stat)
+
+OUR RESPONSE: We made this change.
 	
-OUR RESPONSE: Please note that we're now running the development version of dplyr that has the fix for the problem with `case_when()`. We added spaces around all double equals in the paper. We've changed "this can't be NA" to "can't put NA in place of "missing"" Is it possible to set things to missing in `case_when()`? We don't see a way to do that. When we try, we get the error message `RHS of case 5 (NA): must be type character, not logical`. 
-XX NH re: tally()
+
 	
 > Line 222: What do you mean by "harder to miss possible edge cases"?
 
-OUR RESPONSE: XX
+OUR RESPONSE: We've changed this to "special cases".
 
 > Code chunk following Line 230: "length(levels(drinkstat))==3" = "length(levels(drinkstat)) == 3" (whitspaces around ==)
 
@@ -220,12 +230,12 @@ OUR RESPONSE: Fixed
 	- Will the comments about the code that doesn't work be removed? If not, what is the benefit of keeping them in?
 	- Last three lines of code: Explain why all three are necessary, or if not, why they are interchangeable.
 
-OUR RESPONSE: XX
+OUR RESPONSE: We have removed this comment and simplified the example.
 
 	
 > Line 235-236: "Aspects of data wrangling involving categorical variables can be problematic and error-prone." = "Aspects of data wrangling in R involving categorical variables can be problematic and error-prone." (since the discussion in this paper is about doing this in R, not other languages/packages)
 
-OUR RESPONSE: XX
+OUR RESPONSE: Done.
 
 > Line 238: "tidyverse mini-language of R": I like the term "mini-language", but is that commonly used?
 
@@ -243,7 +253,9 @@ OUR RESPONSE: We've dropped the mini-language reference.
 
 5. Add appendices or online resources for other examples? Move closing exercise to be online only? -- I suggest providing the GSS data among online resources so that all examples in the paper can be reproduced by the reader.
 
-OUR RESPONSE: XX
+OUR RESPONSE: We have left this to the next level of reviews (but agree that these would be appropriate as supplementary resources).
 
 
 6. Add other references? -- The paper indeed is a bit light on references compared to most journal articles. That being said, it doesn't read like it's not grounded in literature, so I don't think references need to be added just for the sake of adding references. 
+
+OUR RESPONSE: We have added some additional references (but other suggestions are welcomed).
