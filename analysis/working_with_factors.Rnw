@@ -87,7 +87,7 @@ There are some import issues inherent to the data which are not particular to ca
 
 <<>>=
 library(dplyr)
-GSS <- read.csv("../data/GSSoriginal.csv")
+GSS <- read.csv("../data/GSScleaned.csv")
 glimpse(GSS)
 @
 
@@ -111,20 +111,20 @@ There are two typical approaches in \pkg{base} \proglang{R}. One is more compact
 
 \subsection*{Compact but fragile (base R)}
 <<>>=
-levels(GSS$Labor.force.status)
-summary(GSS$Labor.force.status)
+levels(GSS$LaborStatus)
+summary(GSS$LaborStatus)
 @
 
 <<>>=
-levels(GSS$Labor.force.status) <- c(levels(GSS$Labor.force.status)[1:5], 
+levels(GSS$LaborStatus) <- c(levels(GSS$LaborStatus)[1:5], 
                              "Temporarily not working", 
                              "Unemployed, laid off", 
                              "Working full time", 
                              "Working part time")
-summary(GSS$Labor.force.status)
+summary(GSS$LaborStatus)
 @
 
-This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. We call this a \emph{fragile} process since future datasets may cause a workflow to break (a related concept in computer science is \emph{software brittleness}). XX NH citation. Why is this fragile?  By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k' comes first in the alphabet. If the data gets changed outside of R, for example so responses currently labeled ``Working full time'' get labeled ``Full time work'', the code will not generate an error message, but will mislabel all the data such that the \verb#Labor.force.status# variable is essentially meaningless.  (Another possible issue arises with strings that include non-ASCII characters, where the default of order levels may vary from locale to locale.)
+This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. We call this a \emph{fragile} process since future datasets may cause a workflow to break (a related concept in computer science is \emph{software brittleness}). XX NH citation. Why is this fragile?  By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k' comes first in the alphabet. If the data gets changed outside of R, for example so responses currently labeled ``Working full time'' get labeled ``Full time work'', the code will not generate an error message, but will mislabel all the data such that the \verb#LaborStatus# variable is essentially meaningless.  (Another possible issue arises with strings that include non-ASCII characters, where the default of order levels may vary from locale to locale.)
 
 The workflow will also fail if additional factor levels are added after the fact. In our experience, both with students and scientific collaborators, spreadsheet data can be easily changed in these ways. Others have noted this concern~\citep{Lee2016}. 
 
@@ -139,13 +139,13 @@ factor("a", levels="c")
 Another (more robust method) to recode this variable in \pkg{base} \proglang{R} is to use subsetting to overwrite particular values in the data. 
 
 <<>>=
-summary(GSS$Political.party.affiliation)
-GSS$NewParty <- as.character(GSS$Political.party.affiliation)
-GSS$NewParty[GSS$Political.party.affiliation == "Ind,near dem"] <- 
+summary(GSS$PoliticalParty)
+GSS$NewParty <- as.character(GSS$PoliticalParty)
+GSS$NewParty[GSS$PoliticalParty == "Ind,near dem"] <- 
   "Independent, near democrat"
-GSS$NewParty[GSS$Political.party.affiliation == "Ind,near rep"] <- 
+GSS$NewParty[GSS$PoliticalParty == "Ind,near rep"] <- 
   "Independent, near republican"
-GSS$NewParty[GSS$Political.party.affiliation == "Not str democrat"] <- 
+GSS$NewParty[GSS$PoliticalParty == "Not str democrat"] <- 
   "Not strong democrat"
 GSS$NewParty <- factor(GSS$NewParty)
 summary(GSS$NewParty)
@@ -159,14 +159,14 @@ This second approach is more robust, because if the labels or ordering of levels
 The \verb#recode()# function in the \pkg{dplyr} package is a vectorized function, which combines the robustness of the second base R approach while also reducing the verbosity. It still suffers from the problem of misspelling and cut-and-paste errors, because it will not generate an error message if you try to recode a non-existent level. 
 <<>>=
 GSS <- GSS %>% 
-  mutate(Labor.force.status =  
-    recode(Labor.force.status, 
+  mutate(LaborStatus =  
+    recode(LaborStatus, 
            `Temporarily not working  ` = "Not working",
            `Keeping house` = "Homemaker",
            `School` = "In school",
            `Part time` = "Working part time",
            `Full time` = "Working full time"))
-summary(GSS$Labor.force.status)
+summary(GSS$LaborStatus)
 @
 In the above example, notice the trailing space in \verb#`Temporarily not working `# in the \verb#recode()# call. Because of this typo (the original factor level is actually \verb#`Temporarily not working'#), the original factor level persists after the recode. 
 
@@ -192,7 +192,7 @@ Again, there is a fragile way to reorder the factor levels in base R, and a more
 One common way to make this sort of change is to pass an argument to \verb#levels# within the \verb#factor()# function. However, this is fragile with respect to spelling issues and trailing whitespace. 
 
 <<>>=
-famIncome <- GSS$Opinion.of.family.income
+famIncome <- GSS$OpinionOfIncome
 summary(famIncome)
 test <- factor(famIncome, levels = c("Far above average", "Above average", "Average ",
                                      "Below Average", "Far below average", "Don't know",
@@ -204,7 +204,7 @@ Note that many of the category totals come through appropriately, but several to
 
 An approach that looks similar upon inspection but actually performs quite differently is to overwrite the \verb#levels()# of the factor outside the \verb#factor()# command. It is tempting for new analysts to write code such as the following, which completely breaks the association between rows and factor labels the data set.
 <<>>=
-famIncome <- GSS$Opinion.of.family.income
+famIncome <- GSS$OpinionOfIncome
 summary(famIncome)
 levels(famIncome) <- c("Far above average", "Above average", "Average", "Below Average", 
   "Far below average", "Don't know", "No answer")
@@ -214,11 +214,11 @@ summary(famIncome)
 An approach that will not suffer from spelling mistakes is to use numeric indexing the reorder the levels. 
 
 <<>>=
-summary(GSS$Opinion.of.family.income)
-levels(GSS$Opinion.of.family.income)
-levels(GSS$Opinion.of.family.income) <- 
-  levels(GSS$Opinion.of.family.income)[c(5,1:3,6,4,7)]
-levels(GSS$Opinion.of.family.income)
+summary(GSS$OpinionOfIncome)
+levels(GSS$OpinionOfIncome)
+levels(GSS$OpinionOfIncome) <- 
+  levels(GSS$OpinionOfIncome)[c(5,1:3,6,4,7)]
+levels(GSS$OpinionOfIncome)
 @
 
 This is both verbose and depends on the number and order of the levels staying the same. If another factor level is added to the dataset, the above code will generate an error message because the number of levels differs. This example illustrates why it is sometimes dangerous to replace an old version of a data frame with a new version.
@@ -226,9 +226,9 @@ This is both verbose and depends on the number and order of the levels staying t
 Even worse, if the code gets run more than once, the order will be broken. Particularly when working interactively, this is all too easy to do. 
 
 <<>>=
-levels(GSS$Opinion.of.family.income) <- 
-  levels(GSS$Opinion.of.family.income)[c(5,1:3,6,4,7)]
-levels(GSS$Opinion.of.family.income)
+levels(GSS$OpinionOfIncome) <- 
+  levels(GSS$OpinionOfIncome)[c(5,1:3,6,4,7)]
+levels(GSS$OpinionOfIncome)
 @
 
 The more times the code is run, the more mixed up the labels and observations get. 
@@ -238,30 +238,30 @@ Because of the fragility and potential for frustration and mistakes associated w
 <<>>=
 # devtools::install_github("hadley/forcats")
 library(forcats)
-summary(GSS$Opinion.of.family.income)
+summary(GSS$OpinionOfIncome)
 GSS <- GSS %>%
-  mutate(Opinion.of.family.income = 
-           fct_relevel(Opinion.of.family.income, 
+  mutate(OpinionOfIncome = 
+           fct_relevel(OpinionOfIncome, 
                        "Far above average", 
                        "Above average", 
                        "Average", 
                        "Below average", 
                        "Far below average"))
-summary(GSS$Opinion.of.family.income)
+summary(GSS$OpinionOfIncome)
 @
 
 Notice the levels we did not mention end up at the back end of the ordering. Running the code again does not break things. 
 
 <<>>=
 GSS <- GSS %>%
-  mutate(Opinion.of.family.income = 
-           fct_relevel(Opinion.of.family.income, 
+  mutate(OpinionOfIncome = 
+           fct_relevel(OpinionOfIncome, 
                        "Far above average", 
                        "Above average", 
                        "Average", 
                        "Below average", 
                        "Far below average"))
-summary(GSS$Opinion.of.family.income)
+summary(GSS$OpinionOfIncome)
 @
 
 \section*{Combining several levels into one}
@@ -272,23 +272,23 @@ This is another common task. Maybe you want fewer coefficients in your model, or
 \subsubsection*{Fragile method (base R)}
 This method overwrites the labels of factor levels with repeated labels in order to group levels together. 
 <<>>=
-levels(GSS$Labor.force.status) <- c("Not employed", "No answer",
+levels(GSS$LaborStatus) <- c("Not employed", "No answer",
                              "Other", "Not employed", 
                              "Not employed", "Not employed", 
                              "Not employed", "Employed", "Employed")
-summary(GSS$Labor.force.status)
+summary(GSS$LaborStatus)
 @
 As before, this is fragile because it depends on the order of the factor levels not changing, and on a human accurately counting the indices of all the levels they wish to change. 
 
 \subsubsection*{Robust method}
 The \verb#recode()# function does what we want, this time for an example using race/ethnicity.
 <<>>=
-levels(GSS$Race.of.respondent)
+levels(GSS$Race)
 GSS <- GSS %>% 
-  mutate(Race.of.respondent = recode(Race.of.respondent, 
+  mutate(Race = recode(Race, 
     `Black` = "Nonwhite", 
     `Other` = "Nonwhite"))
-levels(GSS$Race.of.respondent)
+levels(GSS$Race)
 @
 
 
@@ -302,7 +302,7 @@ We might want to turn this into a factor variable with two levels: 18-65, and ov
 \subsubsection*{Fragile method (base R)}
 In order to break this data apart as simply as possible, we need to make it numeric. To start, we recode the label for ``89 or older" to read ``89". Already, we are doing something fragile. 
 <<>>=
-GSS$BaseAge <- GSS$Age.of.respondent
+GSS$BaseAge <- GSS$Age
 levels(GSS$BaseAge)
 levels(GSS$BaseAge) <- c(levels(GSS$BaseAge)[1:71], "89", "No answer")
 @
@@ -328,7 +328,7 @@ The \pkg{dplyr} method follows similar logic. However, instead of explicitly ove
 <<>>=
 library(readr)
 GSS <- GSS %>%
-  mutate(dplyrAge = parse_number(Age.of.respondent)) %>%
+  mutate(dplyrAge = parse_number(Age)) %>%
   mutate(dplyrAge = ifelse(dplyrAge < 65, "18-65", "65 and up"),
          dplyrAge = factor(dplyrAge))
 summary(GSS$dplyrAge)
@@ -432,10 +432,10 @@ We also might want to ensure the factor labels are exactly what we were expectin
 
 <<error = TRUE>>=
 library(testthat)
-str(levels(GSS$Race.of.respondent))
+str(levels(GSS$Race))
 str(c("White", "Nonwhite"))
 str(sort(c("White", "Nonwhite")))
-expect_equivalent(levels(GSS$Race.of.respondent), c("Nonwhite", "White")) 
+expect_equivalent(levels(GSS$Race), c("Nonwhite", "White")) 
 @
 
 While assertions of this sort are most commonly used to provide error-checking within functions, we believe that they can and should be incorporated into working code.  In this manner they may serve as the basis for a function at some point in the future.
@@ -489,8 +489,23 @@ These names are an improvement, but now some are full of periods. We'd like to r
 library(dplyr)
 GSS <- GSS %>% 
   rename(Year = Gss.year.for.this.respondent.......................,
-         Occupational.prestige.score.1970 = Rs.occupational.prestige.score...1970.)
+         ID = Respondent.id.number,
+         LaborStatus = Labor.force.status,
+         OccupationalPrestigeScore = Rs.occupational.prestige.score...1970.,
+         MaritalStatus = Marital.status,
+         NumChildren = Number.of.children,
+         Age = Age.of.respondent,
+         HighestSchoolCompleted = Highest.year.of.school.completed,
+         Race = Race.of.respondent,
+         ChildhoodFamilyIncome = Rs.family.income.when.16.yrs.old,
+         TotalFamilyIncome = Total.family.income,
+         RespondentIncome = Respondents.income,
+         PoliticalParty = Political.party.affiliation,
+         OpinionOfIncome = Opinion.of.family.income,
+         SexualOrientation = Sexual.orientation)
 names(GSS)
+GSS <- GSS %>%
+  select(-Total.family.income.1)
 @
 With the data loaded and the names adjusted, we can write the data to a new file for use in the body of the paper. 
 <<>>=
