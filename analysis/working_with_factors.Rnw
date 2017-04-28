@@ -18,7 +18,7 @@
 \keywords{statistical computing; data derivation; data science; data management}
 
 \begin{abstract}
-Data wrangling is a critical foundation of data science, and wrangling of categorical data is an important component of this process. However, categorical data can introduce unique issues in data wrangling, particularly in real-world settings with collaborators and periodically-updated dynamic data. This paper discusses common problems arising from categorical variable transformations in R, demonstrate the use of factors, and suggest approaches to address data wrangling challenges. For each problem, we present at least two strategies for management, one in base R and the other from the `tidyverse.' We consider several motivating examples, suggest defensive coding strategies, and outline principles for data wrangling to help ensure data quality and sound analysis.
+Data wrangling is a critical foundation of data science, and wrangling of categorical data is an important component of this process. However, categorical data can introduce unique issues in data wrangling, particularly in real-world settings with collaborators and periodically-updated dynamic data. This paper discusses common problems arising from categorical variable transformations in R, demonstrates the use of factors, and suggests approaches to address data wrangling challenges. For each problem, we present at least two strategies for management, one in base R and the other from the `tidyverse.' We consider several motivating examples, suggest defensive coding strategies, and outline principles for data wrangling to help ensure data quality and sound analysis.
 \end{abstract}
 
 \begin{document}
@@ -34,13 +34,13 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 
 \section*{Introduction}
 
-Wrangling skills provide an intellectual and practical foundation for data science. Careless data derivation operations can lead to errors or inconsistencies in analysis~\citep{HerMur2015, FitzPen2014}. The wrangling of categorical data presents particular challenges and is highly relevant because many variables are categorical (e.g., gender, income bracket, U.S. state) but coded with numerical values. It is easy to break the relationship between category numbers and category labels without realizing it, thus losing the information encoded in a variable. If data sources change upstream (for example, if a domain expert is providing spreadsheet data at regular intervals), code that worked on the initial data may not generate an error message, but could silently produce incorrect results.  
+Wrangling skills provide an intellectual and practical foundation for data science. Careless data cleaning operations can lead to errors or inconsistencies in analysis~\citep{HerMur2015, FitzPen2014}. The wrangling of categorical data presents particular challenges and is highly relevant because many variables are categorical (e.g., gender, income bracket, U.S. state) but coded with numerical values. It is easy to break the relationship between category numbers and category labels without realizing it, thus losing the information encoded in a variable. If data sources change upstream (for example, if a domain expert is providing spreadsheet data at regular intervals), code that worked on the initial data may not generate an error message, but could silently produce incorrect results.  
 
 Statistical and data science tools need to foster good practice and provide a robust environment for data wrangling and data management.  This paper focuses on how \proglang{R} deals with categorical data, and showcases best practices for categorical data manipulation in \proglang{R} to produce reproducible workflows. We consider a number of common idioms related to categorical data that arise frequently in data cleaning and preparation, propose some guidelines for defensive coding, and discuss settings where analysts often get tripped up when working with categorical data. 
 
 For example, data ingested into \proglang{R} from spreadsheets can lead to problems with categorical data because of the different storage methods possible in both \proglang{R} and the spreadsheets themselves~\citep{WilBry2016}. The examples below will help flag when these issues arise or avoid them altogether. 
 
-To ground our work, we will compare and contrast how categorical data are treated in \pkg{base} \proglang{R} versus the tidyverse~\citep{Wic2014, Wic2016b}. Tools from the tidyverse, discussed in another paper in this special issue (see https://github.com/dsscollection/tidyflow), are designed to make analysis purer, more predictable, and pipeable. Key components of the tidyverse that we will address in this paper include \pkg{ggplot2}, \pkg{dplyr}, \pkg{tidyr}, \pkg{forcats}, and \pkg{readr}. This suite of packages help facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015}. While \proglang{R} code written in \pkg{base} can also have this quality, a common tendency is to use row or column numbers in code, which makes the result less reproducible. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).  
+To ground our work, we will compare and contrast how categorical data are treated in \pkg{base} \proglang{R} versus the tidyverse~\citep{Wic2014, Wic2016b}. Tools from the tidyverse, discussed in another paper in this special issue (see https://github.com/dsscollection/tidyflow), are designed to make analysis purer, more predictable, and pipeable. Key components of the tidyverse that we will address in this paper include \pkg{ggplot2}, \pkg{dplyr}, \pkg{tidyr}, \pkg{forcats}, and \pkg{readr}. This suite of packages helps facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015}. While \proglang{R} code written in \pkg{base} can also have this quality, a common tendency is to use row or column numbers in code, which makes the result less reproducible. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).  
 
 Our goal is to make the case that it is better to work with categorical data using tidyverse packages than with \pkg{base} \proglang{R}. Tidyverse code is more human readable, which can help reduce errors from the start, and the functions we highlight have been designed to make it harder to accidentally remove relationships implicit in categorical data. Because these issues are even more salient for new users, we recommend that instructors should teach tidyverse approaches from the start. 
 
@@ -318,7 +318,7 @@ We're avoiding the pitfall from the introduction here by not simply using \verb#
 Now, we can write some conditional logic
 <<>>=
 summary(GSS$BaseAge)
-GSS$BaseAge <- ifelse(GSS$BaseAge > 65, "18-64", "65 and up")
+GSS$BaseAge <- ifelse(GSS$BaseAge < 65, "18-64", "65 and up")
 GSS$BaseAge <- factor(GSS$BaseAge)
 summary(GSS$BaseAge)
 @
@@ -526,10 +526,10 @@ value&description \\ \hline
 \end{tabular}
 
 
-Create a new variable called \verb#primsub# combining the primary and secondary substances into a categorical variable with values corresponding to primary and secondary substances of the form: {\tt alcohol only}, {\tt cocaine only}, `heroin only', `alcohol-cocaine', `cocaine-alcohol', or `other'.  Code any group with fewer than 5 entries as `alcohol-other', `cocaine-other', or `heroin-other'.  If \verb#PRIM\_SUB == 6# make the \verb#primsub# variable missing.
+Create a new variable called \verb#primsub# combining the primary and secondary substances into a categorical variable with values corresponding to primary and secondary substances of the form: {\tt alcohol only}, {\tt cocaine only}, {\tt heroin only}, {\tt alcohol-cocaine}, {\tt cocaine-alcohol}, or {\tt other}.  Code any group with fewer than 5 entries as {\tt alcohol-other}, {\tt cocaine-other}, or {\tt heroin-other}.  If \verb#PRIM\_SUB == 6# make the \verb#primsub# variable missing.
 
 
-How many subjects are there in the `alcohol-none' group?  How many subjects are there in the `alcohol-other' group?  What are the three most common groups?
+How many subjects are there in the {\tt alcohol-none} group?  How many subjects are there in the {\tt alcohol-other} group?  What are the three most common groups?
 
 SOLUTION:
 <<>>=
