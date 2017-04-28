@@ -70,6 +70,11 @@ as.numeric(c("hello"))
 as.numeric(factor(c("hello")))
 @
 
+The factor function has other behavior that feels unexpected. For example, the following code silently makes a missing value, because the values in the data and the levels do not match. 
+<<>>=
+factor("a", levels="c")
+@
+
 The unfortunate behavior of factors in \proglang{R} has led to an online movement against the default behavior of many data import functions to make factors out of any variable composed as strings \citep{Pen2015,readr}. The tidyverse is part of this movement, with functions from the \pkg{readr} package defaulting to leaving strings as-is. (Others have chosen to add \verb#options(stringAsFactors=FALSE)# into their startup commands.)
 
 Although the storage issues have been solved, and there are problems with defaulting strings to factors, factors are still necessary for some data analytic tasks. The most salient case is in modeling. When you pass a factor variable into \verb#lm()# or \verb#glm()#, \proglang{R} automatically creates indicator (or more colloquially `dummy') variables for each of the levels and picks one as a reference group. 
@@ -99,10 +104,10 @@ The remainder of this paper is organized around case studies (examples) to carry
 \item Making derived factor variables.
 \end{enumerate}
 
-Each case study begins with a problem, and presents several solutions. Typically, we contrast a method that uses the functionality of \pkg{base} \proglang{R} functions with an approach from the tidyverse along with some annotations of the code as needed. We will argue that while both approaches can solve the problem, the tidyverse solution tends to be simpler, easier to learn, and more robust. 
+Each case study begins with a problem, and presents several solutions. Typically, we contrast a method that uses the functionality of \pkg{base} \proglang{R} functions with an approach from the tidyverse along with some annotations of the code as needed. We will argue that while both approaches can solve the problem, the tidyverse solution tends to be simpler, easier to learn, and less fragile. 
 
 \section*{Changing the labels of factor levels}
-In our first example, we will be considering the labor status variable. It is a categorical variable with \Sexpr{length(levels(GSS$Labor.force.status))} levels. Most of the labels are spelled out fully, but a few are strangely formatted. We want to change this. 
+In our first example, we will be considering the labor status variable. It is a categorical variable with \Sexpr{length(levels(GSS$LaborStatus))} levels. Most of the labels are spelled out fully, but a few are strangely formatted. We want to change this. 
 
 This is a specific case of the more general problem of changing the text of factor labels, so they appear more nicely formatted in a plot, for example.
 
@@ -110,29 +115,31 @@ There are two typical approaches in \pkg{base} \proglang{R}. One is more compact
 
 
 \subsection*{Compact but fragile (base R)}
+To begin this example, we will create a new copy of the variable in question so as not to leave the original data for comparison. 
 <<>>=
-levels(GSS$LaborStatus)
-summary(GSS$LaborStatus)
+GSS$BaseLaborStatus <- GSS$LaborStatus
+levels(GSS$BaseLaborStatus)
+summary(GSS$BaseLaborStatus)
 @
 
+Almost all of our code examples will start with some examintation of the \verb#levels()# and \verb#summary()# of the variable, in order to keep track of what the expected results will be. Now that we've seen the counts, we want to rephrase the labels for a few categories. 
+
 <<>>=
-levels(GSS$LaborStatus) <- c(levels(GSS$LaborStatus)[1:5], 
+levels(GSS$BaseLaborStatus) <- c(levels(GSS$BaseLaborStatus)[1:5], 
                              "Temporarily not working", 
                              "Unemployed, laid off", 
                              "Working full time", 
                              "Working part time")
-summary(GSS$LaborStatus)
+summary(GSS$BaseLaborStatus)
 @
 
-This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. We call this a \emph{fragile} process since future datasets may cause a workflow to break (a related concept in computer science is \emph{software brittleness}). XX NH citation. Why is this fragile?  By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k' comes first in the alphabet. If the data gets changed outside of R, for example so responses currently labeled ``Working full time'' get labeled ``Full time work'', the code will not generate an error message, but will mislabel all the data such that the \verb#LaborStatus# variable is essentially meaningless.  (Another possible issue arises with strings that include non-ASCII characters, where the default of order levels may vary from locale to locale. This means that code could create different results based on where it was run.)
+This method is less than ideal, because it depends on the data coming in with the factor levels ordered in a particular way. We leave the first five levels the same, then overwrite the last four. We call this a \emph{fragile} process since future datasets may cause a workflow to break (a related concept in computer science is \emph{software brittleness}). XX NH citation. Why is this fragile?  By default, \proglang{R} orders factor levels alphabetically. So, ``Keeping house'' is first not because it is the most common response, but simply because `k' comes first in the alphabet. If the data gets changed outside of R, for example so responses currently labeled ``Working full time'' get labeled ``Full time work'', the code above will not generate an error message, but will mislabel all the data such that the \verb#BaseLaborStatus# variable is essentially meaningless.  
+
+The issue of alphabetic ordering becomes even more relevant when considering strings that include non-ASCII characters, where the default of order levels may vary from locale to locale. This means that code could create different results based on where it was run.
 
 The workflow will also fail if additional factor levels are added after the fact. In our experience, both with students and scientific collaborators, spreadsheet data can be easily changed in these ways. Others have noted this concern~\citep{Lee2016}. 
 
-On a similar note, 
-the following code silently makes a missing value.
-<<>>=
-factor("a", levels="c")
-@
+
 
 
 \subsection*{Robust but verbose (base R)}
