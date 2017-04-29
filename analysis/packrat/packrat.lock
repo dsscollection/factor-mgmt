@@ -1,6 +1,6 @@
 PackratFormat: 1.4
 PackratVersion: 0.4.8.2
-RVersion: 3.3.0
+RVersion: 3.4.0
 Repos: CRAN=https://cran.rstudio.com/
 
 Package: BH
@@ -254,8 +254,8 @@ Hash: bdc4d48c3135e8f3b399536ddf160df4
 
 Package: markdown
 Source: CRAN
-Version: 0.7.7
-Hash: fea2343a1119d61b0cc5c0a950d103a3
+Version: 0.8
+Hash: 045d7c594d503b41f1c28946d076c8aa
 Requires: mime
 
 Package: memoise
@@ -416,8 +416,8 @@ Requires: DBI, RSQLite, chron, gsubfn, proto
 
 Package: stringi
 Source: CRAN
-Version: 1.1.3
-Hash: 458dfc7d682c0f80909521fe482f7c6d
+Version: 1.1.5
+Hash: b6308e49357a0b475f433599e0d8b5eb
 
 Package: stringr
 Source: CRAN

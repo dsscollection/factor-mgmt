@@ -28,21 +28,7 @@ OUR RESPONSE: We've added a list of a few packages.
 
 > Changing the labels of factor levels: Compact but fragile base R example uses a different variable than the robust but verbose base R and Direct and robust dplyr. It would make sense to use the same example for showcasing all three approaches.
 
-OUR RESPONSE: XX AM to address?
-
-I'm struggling with this. I know in other places we have saved the variable as a new object so we don't overwrite anything in the original data, but I like how the repeated dollar signs appear here. This doesn't have the same feeling: 
-
-```{r, eval=FALSE}
-laborForce <- GSS$Labor.force.status
-levels(laborForce) <- c(levels(laborForce)[1:5], 
-                             "Temporarily not working", 
-                             "Unemployed, laid off", 
-                             "Working full time", 
-                             "Working part time")
-summary(laborForce)
-```
-
-I've edited the examples to all use the laborForce status but do slightly different changes. 
+OUR RESPONSE: Each section should now use the same variable for easier comparisons. 
 
 
 > The defensive coding section could benefit from a discussion on why both assertthat and testthat packages are useful. Is there functionality in one package that is not in the other? If so, the examples should reflect this. If not, and both are showcased just to provide alternatives, it would be a good idea to mention this. Also, I believe the assertions are often used within functions, but the example given here is not within a function. Why would someone not just use "length(levels(drinkstat))==3", which would give TRUE/FALSE, but instead put this within the assert_that function? It would be useful to spell out the reason for the reader.

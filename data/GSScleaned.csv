@@ -1,4 +1,4 @@
-Year,ID,LaborStatus,OccupationalPrestigeScore,MaritalStatus,NumChildren,Age,HighestSchoolCompleted,Respondents.sex,Race,ChildhoodFamilyIncome,TotalFamilyIncome,RespondentIncome,PoliticalParty,OpinionOfIncome,SexualOrientation
+Year,ID,LaborStatus,OccupationalPrestigeScore,MaritalStatus,NumChildren,Age,HighestSchoolCompleted,Sex,Race,ChildhoodFamilyIncome,TotalFamilyIncome,RespondentIncome,PoliticalParty,OpinionOfIncome,SexualOrientation
 2014,1,Working fulltime,0,Divorced,0,53.000000,16,Male,White,Below average,$25000 or more,$25000 or more,Not str republican,Above average,Heterosexual or straight
 2014,2,Working fulltime,0,Married,0,26.000000,16,Female,White,Average,$25000 or more,$25000 or more,Not str republican,Above average,Heterosexual or straight
 2014,3,"Unempl, laid off",0,Divorced,1,59.000000,13,Male,White,Below average,$25000 or more,Not applicable,Strong republican,Below average,Heterosexual or straight
