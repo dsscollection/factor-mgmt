@@ -39,11 +39,11 @@ OUR RESPONSE: We have woven this into the "Compact but fragile" section.
 
 > I'm not sure if this can go anyway in the paper, but I realised in some sense you never visualise character strings, you always visualise factors. (i.e. you only see what's in the data, not the infinity of other possible values)
 
-OUR RESPONSE: XX AM to think about?
+OUR RESPONSE: This feels a bit philosophical, and we're not sure if we have captured the idea, but we added a sentence into the "Categorical data in R" section. 
 
 > I think you should mention factors are right for models because you can't make predictions about factors that you didn't observe in the training data
 
-OUR RESPONSE: XX AM to address?
+OUR RESPONSE: Added a note to the conclusion.
 
 > Would be nice to have link to paper in README and markdown version of paper for easy preview on GitHub. Should the paper be in the root directory?
 

@@ -50,8 +50,7 @@ Consider a variable describing gender including categories \verb#male#, \verb#fe
 
 In early versions of \proglang{R}, storing categorical data as a factor variable was considerably more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015, Lum2015}. However, \proglang{R} uses a global string pool, so each unique string is only stored once, so the storage is now less of an issue~\citep{Pen2015}. For historical (or possibly anachronistic) reasons, many functions store variables by default as factors.
 
-While factors are important when including categorical variables in regression models, they
-can be tricky to deal with, since many operations applied to them return different values than when applied to character vectors.  As an example, consider a set of decades,
+While factors are important when including categorical variables in regression models and when plotting data, they can be tricky to deal with, since many operations applied to them return different values than when applied to character vectors.  As an example, consider a set of decades,
 
 <<>>=
 x1 <- c(10, 10, 20, 20, 40)
@@ -83,6 +82,7 @@ For simple cases, this behavior can also be achieved with a character vector. Ho
 
 While ordering is particularly important when doing ordinal logistic regression and multinomial logistic regression, the use of alphabetic ordering by default means even simple linear regression can be affected. 
 
+In the context of visualizing data, factors are also relevant because they allow categorical variables to be mapped to aesthetic attributes. 
 
 While factors are important, they can often be hard to deal with. Because of the way the group numbers are stored separately from the factor labels, it can be easy to overwrite data in such a way that the original data are lost. They present a steep learning curve for new users.  In this paper, we will suggest best practices for working with factor data. 
 
