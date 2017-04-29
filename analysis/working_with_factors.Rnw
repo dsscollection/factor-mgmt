@@ -199,12 +199,13 @@ Again, there is a fragile way to reorder the factor levels in base R, and a more
 One common way to make this sort of change is to pass an argument to \verb#levels# within the \verb#factor()# function. However, this is fragile with respect to spelling issues and trailing whitespace. 
 
 <<>>=
-famIncome <- GSS$OpinionOfIncome
-summary(famIncome)
-test <- factor(famIncome, levels = c("Far above average", "Above average", "Average ",
-                                     "Below Average", "Far below average", "Don't know",
-                                     "No answer"))
-summary(test)
+GSS$BaseOpinionOfIncome <- GSS$OpinionOfIncome
+summary(GSS$BaseOpinionOfIncome )
+GSS$BaseOpinionOfIncome <- 
+  factor(GSS$BaseOpinionOfIncome, 
+         levels = c("Far above average", "Above average", "Average ", "Below Average", 
+                    "Far below average", "Don't know", "No answer"))
+summary(GSS$BaseOpinionOfIncome )
 @
 
 Note that many of the category totals come through appropriately, but several totals get set to 0 (`Average' because of the trailing whitespace and `Below Average' because of the mistaken capitalization). These errors can be exceedingly frustrating to troubleshoot. 
@@ -213,19 +214,21 @@ An approach that looks similar upon inspection but actually does not work is to 
 <<>>=
 badApproach <- GSS$OpinionOfIncome
 summary(badApproach)
-levels(badApproach) <- c("Far above average", "Above average", "Average", "Below Average", 
-  "Far below average", "Don't know", "No answer")
+levels(badApproach) <- c("Far above average", "Above average", 
+                         "Average", "Below Average", "Far below average", 
+                         "Don't know", "No answer")
 summary(badApproach)
 @
 Notice that no errors were generated, but the labels have been clobbered and the counts do not match up anymore. Instead of \verb#Far above average# having 65 observations, it has 483. 
 
-Another \pkg{base} approach that will not suffer from spelling mistakes is to use numeric indexing the reorder the levels. Again, we need to make sure we're using the indexing within a \verb#factor()# call. 
+Another \pkg{base} approach that will not suffer from spelling mistakes is to use numeric indexing to reorder the levels. Again, we need to make sure we're using the indexing within a \verb#factor()# call. 
 
 <<>>=
 GSS$BaseOpinionOfIncome <- GSS$OpinionOfIncome
 summary(GSS$BaseOpinionOfIncome)
-GSS$BaseOpinionOfIncome <- factor(GSS$BaseOpinionOfIncome, 
-                                  levels=levels(GSS$BaseOpinionOfIncome)[c(5,1:3,6,4,7)])
+GSS$BaseOpinionOfIncome <- 
+  factor(GSS$BaseOpinionOfIncome, 
+         levels=levels(GSS$BaseOpinionOfIncome)[c(5,1:3,6,4,7)])
 summary(GSS$BaseOpinionOfIncome)
 @
 
@@ -236,12 +239,11 @@ Again, if you try this approach outside of a \verb#factor()# call, no errors are
 <<>>=
 badApproach <- GSS$OpinionOfIncome
 summary(badApproach)
-levels(badApproach) <- 
-  levels(badApproach)[c(5,1:3,6,4,7)]
+levels(badApproach) <- levels(badApproach)[c(5,1:3,6,4,7)]
 summary(badApproach)
 @
 
-Notice that once again, \verb#Far above average# has been given the wrong number of observations. \pkg{base} methods for reordering factor levels are very fragile in this way-- approaches that look fine and do not give errors can easily sneak in to code. 
+Notice that once again, \verb#Far above average# has been given the wrong number of observations. Here, \pkg{base} methods for reordering factor levels are very fragile. Approaches that appear functional and do not generate error messages can easily lead to garbled data. 
 
 \subsection*{Robust method}
 Because of the fragility and potential for frustration and mistakes associated with reordering levels in base R, we recommend the use of a tidyverse package. The package \pkg{forcats} (where the name is an anagram of the word factors!)~\citep{Wic2016}. \pkg{forcats} is included in the tidyverse.  It includes a \verb#fct_relevel()# function that does exactly what we want. It allows us to specify the order of our factor levels (either completely or partially) and is robust to re-running code in an interactive session. 
