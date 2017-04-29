@@ -412,6 +412,7 @@ HELPsmall <- HELPsmall %>%
 tally( ~ drink_stat, exclude=NULL, data = HELPsmall)
 
 HELPsmall %>%
+  group_by(drink_stat) %>%
   dplyr::count()
 @
 
