@@ -11,7 +11,7 @@
 
 \author[1]{Amelia McNamara}
 \author[2]{Nicholas J Horton}
-\affil[1]{Statistical and Data Sciences Program, Smith College}
+\affil[1]{Program in Statistical and Data Sciences, Smith College}
 \affil[2]{Department of Mathematics and Statistics, Amherst College}
 
 
