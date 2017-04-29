@@ -204,42 +204,44 @@ summary(famIncome)
 test <- factor(famIncome, levels = c("Far above average", "Above average", "Average ",
                                      "Below Average", "Far below average", "Don't know",
                                      "No answer"))
-summary(famIncome)
+summary(test)
 @
 
 Note that many of the category totals come through appropriately, but several totals get set to 0 (`Average' because of the trailing whitespace and `Below Average' because of the mistaken capitalization). These errors can be exceedingly frustrating to troubleshoot. 
 
-An approach that looks similar upon inspection but actually performs quite differently is to overwrite the \verb#levels()# of the factor outside the \verb#factor()# command. It is tempting for new analysts to write code such as the following, which completely breaks the association between rows and factor labels the data set.
+An approach that looks similar upon inspection but actually does not work is to overwrite the \verb#levels()# of the factor outside the \verb#factor()# command. It is tempting for new analysts to write code such as the following, which completely breaks the association between rows and factor labels the data set.
 <<>>=
-famIncome <- GSS$OpinionOfIncome
-summary(famIncome)
-levels(famIncome) <- c("Far above average", "Above average", "Average", "Below Average", 
+badApproach <- GSS$OpinionOfIncome
+summary(badApproach)
+levels(badApproach) <- c("Far above average", "Above average", "Average", "Below Average", 
   "Far below average", "Don't know", "No answer")
-summary(famIncome)
+summary(badApproach)
 @
-XX NH I don't know if we should include this because it is so bad. 
+Notice that no errors were generated, but the labels have been clobbered and the counts do not match up anymore. Instead of \verb#Far above average# having 65 observations, it has 483. 
 
-An approach that will not suffer from spelling mistakes is to use numeric indexing the reorder the levels. 
+Another \pkg{base} approach that will not suffer from spelling mistakes is to use numeric indexing the reorder the levels. Again, we need to make sure we're using the indexing within a \verb#factor()# call. 
 
 <<>>=
 GSS$BaseOpinionOfIncome <- GSS$OpinionOfIncome
 summary(GSS$BaseOpinionOfIncome)
-levels(GSS$BaseOpinionOfIncome) <- 
-  levels(GSS$BaseOpinionOfIncome)[c(5,1:3,6,4,7)]
+GSS$BaseOpinionOfIncome <- factor(GSS$BaseOpinionOfIncome, 
+                                  levels=levels(GSS$BaseOpinionOfIncome)[c(5,1:3,6,4,7)])
 summary(GSS$BaseOpinionOfIncome)
 @
 
 This is both verbose and depends on the number and order of the levels staying the same. If another factor level is added to the dataset, the above code will generate an error message because the number of levels differs. This example illustrates why it is sometimes dangerous to replace an old version of a data frame with a new version.
 
-Even worse, if the code gets run more than once, the order will be broken. Particularly when working interactively, this is all too easy to do. 
+Again, if you try this approach outside of a \verb#factor()# call, no errors are generated but the levels get clobbered.  
 
 <<>>=
-levels(GSS$BaseOpinionOfIncome) <- 
-  levels(GSS$BaseOpinionOfIncome)[c(5,1:3,6,4,7)]
-summary(GSS$BaseOpinionOfIncome)
+badApproach <- GSS$OpinionOfIncome
+summary(badApproach)
+levels(badApproach) <- 
+  levels(badApproach)[c(5,1:3,6,4,7)]
+summary(badApproach)
 @
 
-The more times the code is run, the more mixed up the labels and observations get. 
+Notice that once again, \verb#Far above average# has been given the wrong number of observations. \pkg{base} methods for reordering factor levels are very fragile in this way-- approaches that look fine and do not give errors can easily sneak in to code. 
 
 \subsection*{Robust method}
 Because of the fragility and potential for frustration and mistakes associated with reordering levels in base R, we recommend the use of a tidyverse package. The package \pkg{forcats} (where the name is an anagram of the word factors!)~\citep{Wic2016}. \pkg{forcats} is included in the tidyverse.  It includes a \verb#fct_relevel()# function that does exactly what we want. It allows us to specify the order of our factor levels (either completely or partially) and is robust to re-running code in an interactive session. 
