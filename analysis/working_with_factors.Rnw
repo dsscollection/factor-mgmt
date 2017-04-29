@@ -338,7 +338,7 @@ GSS <- GSS %>%
 summary(GSS$tidyAge)
 @
 
-Note that you need to be very sure that the strings with a number have a relevant number. You could accidentally add a number that is not meaningful if numbers appear in unanticipated ways. 
+Note that you need to be very sure that the strings including a number have a relevant number. If one of the levels was labeled `2 or more people in household` it would be converted to the number 2. This would accidentally add a number that is not meaningful. 
 
 \section*{Creating derived categorical variables}
 Challenges often arise when data scientists need to create derived categorical variables.  As an example, consider an indicator of moderate drinking status. The National Institutes of Alcohol Abuse and Alcoholism have published guidelines for moderate drinking \citep{rethinkdrink}. 
