@@ -164,7 +164,7 @@ This second approach is more robust, because if the labels or ordering of levels
 
 \subsection*{Direct and robust (dplyr)}
 
-The \verb#recode()# function in the \pkg{dplyr} package is a vectorized function, which combines the robustness of the second base R approach while also reducing the verbosity. It still suffers from the problem of misspelling and cut-and-paste errors, because it will not generate an error message if you try to recode a non-existent level. 
+The \verb#recode()# function in the \pkg{dplyr} package is a vectorized function, which combines the robustness of the second \pkg{base} \proglang{R} approach while also reducing the verbosity. It still suffers from the problem of misspelling and cut-and-paste errors, because it will not generate an error message if you try to recode a non-existent level. 
 <<>>=
 GSS <- GSS %>% 
   mutate(tidyLaborStatus =  
@@ -455,7 +455,7 @@ We believe further work is needed to continue to make it easier to undertake ana
 
 \section*{Acknowledgements}
 
-Thanks to Hadley Wickham, Mine Cetinkaya-Rundel, Johanna Hardin, Zev Ross, and Colin Rundel for helpful comments and suggestions on an earlier draft.
+Thanks to Hadley Wickham, Mine \c{C}etinkaya-Rundel, Johanna Hardin, Zev Ross, and Colin Rundel for helpful comments and suggestions on an earlier draft.
 
 
 \appendix
@@ -463,9 +463,9 @@ Thanks to Hadley Wickham, Mine Cetinkaya-Rundel, Johanna Hardin, Zev Ross, and C
 \section*{Supplementary Appendix A: Loading the data}\label{load}
 Since this is a reproducible special issue, we want to make sure our data ingestation process is as reproducible as possible. We are using the General Social Survey (GSS) data, which includes many years of data (1972-2014) and many possible variables (150-800 variables, depending on the year)~\citep{GSS2016}. However, the GSS data has some idiosyncrasies. So, we are attempting good-enough practices for data ingest~\citep{WilBry2016}.
 
-The major issue related to reproducibility is the fact that the dataset is not available through an API. For SPSS and Stata users, yearly data are available for direct download on the website. For more format possibilities, users must go through an online wizard to select variables and years for the data they wish to download~\citep{GSS2016b}. For this paper, we selected a subset of the demographic variables and the year 2014. The possible output options from the wizard are Excel (either data and metadata or metadata only), SPSS, SAS, Stata, DDI, or R script. We selected both the Excel and R formats to look at the differences. 
+The major issue related to reproducibility is the fact that the dataset is not available through an API. For SPSS and Stata users, yearly data are available for direct download on the website. For more format possibilities, users must go through an online wizard to select variables and years for the data they wish to download~\citep{GSS2016b}. For this paper, we selected a subset of the demographic variables and the year 2014. The possible output options from the wizard are Excel (either data and metadata or metadata only), SPSS, SAS, Stata, DDI, or \proglang{R} script. We selected both the Excel and \proglang{R} formats to look at the differences. 
 
-The R format provided by the GSS is actually a Stata file and custom R script  using the \pkg{foreign} package to do the translation for you. Here is the result of that process.
+The \proglang{R} format provided by the GSS is actually a Stata file and custom \proglang{R} script  using the \pkg{foreign} package to do the translation. Here is the result of that process.
 
 <<>>=
 source('../data/GSS.r')
