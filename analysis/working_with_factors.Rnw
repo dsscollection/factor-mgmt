@@ -164,7 +164,7 @@ summary(GSS$BaseLaborStatus)
 This second approach is more robust, because if the labels or ordering of levels changes before this code is run it will not overwrite labels on the incorrect data. However, this approach has a number of limitations in addition to being tedious and error prone. It is possible to miss cases, and misspelling and cut-and-paste errors can mean pieces of the code do not actually do anything. 
 
 
-\subsection*{Direct and robust (dplyr)}
+\subsection*{Direct and robust (tidyverse)}
 
 The \verb#recode()# function in the \pkg{dplyr} package is a vectorized function, which combines the robustness of the second \pkg{base} \proglang{R} approach while also reducing the verbosity. It still suffers from the problem of misspelling and cut-and-paste errors, because it will not generate an error message if you try to recode a non-existent level. 
 <<>>=
@@ -247,7 +247,7 @@ summary(badApproach)
 
 Notice that once again, \verb#Far above average# has been given the wrong number of observations. Here, \pkg{base} methods for reordering factor levels are very fragile. Approaches that appear functional and do not generate error messages can easily lead to garbled data. 
 
-\subsection*{Robust method}
+\subsection*{Robust method (tidyverse)}
 Because of the fragility and potential for frustration and mistakes associated with reordering levels in \pkg{base} \proglang{R}, we recommend the use of a tidyverse package. 
 
 The package \pkg{forcats} (where the name is an anagram of the word factors!) is included in the tidyverse~\citep{Wic2016}.  It includes a \verb#fct_relevel()# function that allows for robust reordering of factor levels. It takes a specification of the order of factor levels (either completely or partially) and is robust to re-running code in an interactive session. 
@@ -285,7 +285,7 @@ summary(GSS$BaseMarital)
 @
 As before, this is fragile because it depends on the order of the factor levels not changing, and on a human accurately counting the indices of all the levels they wish to change. 
 
-\subsubsection*{Robust method}
+\subsubsection*{Robust method (tidyverse)}
 In the tidyverse, the \verb#recode()# function performs recoding more robustly.
 <<>>=
 summary(GSS$MaritalStatus)
@@ -331,8 +331,8 @@ GSS$BaseAge <- factor(GSS$BaseAge)
 summary(GSS$BaseAge)
 @
 
-\subsubsection*{Robust method}
-The \pkg{dplyr} method follows similar logic. However, instead of explicitly overwriting \verb#89 or older# with the number 89 using indexing, the tidyverse solution uses the \pkg{readr} \verb#parse_number()# function to remove the numbers from each factor label. This works for the labels that already look numeric, like \verb#18.000000# as well as for \verb#89 or older#. Then conditional logic can be used to split the variable within a mutate command. 
+\subsubsection*{Robust method (tidyverse)}
+The tidyverse method follows similar logic. However, instead of explicitly overwriting \verb#89 or older# with the number 89 using indexing, the tidyverse solution uses the \pkg{readr} \verb#parse_number()# function to remove the numbers from each factor label. This works for the labels that already look numeric, like \verb#18.000000# as well as for \verb#89 or older#. Then conditional logic can be used to split the variable within a mutate command. 
 <<>>=
 library(readr)
 GSS <- GSS %>%
@@ -401,7 +401,7 @@ table(drinkstat, useNA = "always")
 While this approach works, it is hard to follow, check, or debug. The logical conditions are all correctly coded, but require many repetitions of \verb#HELPsmall$variable#, and the missing value was not handled by default (without the \verb#is.na()# call, the missing value would default to be \verb#highrisk# because of the extreme value for \verb#i2# for that subject). 
 
 
-\subsection*{Robust method (dplyr)}
+\subsection*{Robust method (tidyverse)}
 <<>>=
 HELPsmall <- HELPsmall %>%
   mutate(drink_stat = case_when(
