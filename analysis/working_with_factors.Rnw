@@ -170,9 +170,9 @@ GSS <- GSS %>%
   mutate(tidyLaborStatus =  
     recode(LaborStatus, 
            `Temp not working` = "Temporarily not working",
-            `Unempl, laid off` = "Unemployed, laid off",
-             `Working fulltime` = "Working full time",
-            `Working parttime ` =  "Working part time"))
+           `Unempl, laid off` = "Unemployed, laid off",
+           `Working fulltime` = "Working full time",
+           `Working parttime ` =  "Working part time"))
 summary(GSS$tidyLaborStatus)
 @
 In the above example, notice the trailing space in \verb#`Working parttime `# in the \verb#recode()# call. Because of this typo (the original factor level is actually \verb#`Working parttime'#), the original factor level persists after the recode. 
@@ -449,7 +449,7 @@ While assertions of this sort are most commonly used to provide error-checking w
 
 Categorical variables arise commonly in most datasets.  Aspects of data wrangling in \proglang{R} involving categorical variables can be problematic and error-prone, particularly when using \pkg{base} \proglang{R}. In this paper we have outlined some example case studies where analytic tasks can be simplified and made more robust through use of new tools available in the tidyverse. However, these are only some of the issues categorical data presents. 
 
-For example, many analysts use testing and training data when working with models, but without careful thought toward levels of categorical, there can be mismatch between the levels present in the training data and those present in the testing data. If a particular  level was not present in the training data, the model will not be able to make predictions for the observations in the testing data with that level. Even worse, if the two sets have the same number of levels, the model will produce predictions by matching the order of the levels rather than the labels. 
+For example, many analysts use testing and training data when working with models. Without careful thought toward levels of categorical variables, there can be a mismatch between the levels present in the training data and those present in the testing data. If a particular  level was not present in the training data, the model will not be able to make predictions for the observations in the testing data with that level. Even worse, if the two sets have the same number of levels, the model may produce predictions by matching the order of the levels rather than the labels. 
 
 We believe further work is needed to continue to make it easier to undertake analyses requiring data wrangling (particularly with respect to categorical data). New tools and an increased emphasis on defensive coding may help improve the quality of data science moving forward.
 
