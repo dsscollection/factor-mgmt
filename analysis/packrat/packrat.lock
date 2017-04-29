@@ -118,15 +118,11 @@ Hash: 346d3477f87b89692dd1379eaed1a1be
 Requires: R6, assertthat, crayon, rprojroot
 
 Package: devtools
-Source: github
-Version: 1.12.0.9000
-Hash: 2cf2f133e3da0afc531e2dc3c3efd286
-Requires: callr, digest, git2r, httr, jsonlite, memoise, pkgbuild,
-    pkgload, rstudioapi, whisker, withr
-GithubRepo: devtools
-GithubUsername: hadley
-GithubRef: master
-GithubSha1: d8ab190cd05e4bd2a3688a1eab3324109060b111
+Source: CRAN
+Version: 1.12.0
+Hash: bbad95109ae75cbb14099281cda43af2
+Requires: digest, git2r, httr, jsonlite, memoise, rstudioapi, whisker,
+    withr
 
 Package: dichromat
 Source: CRAN
@@ -139,14 +135,10 @@ Version: 0.6.12
 Hash: e53fb8c58673df868183697e39a6a4d6
 
 Package: dplyr
-Source: github
-Version: 0.5.0.9000
-Hash: 021cc70a91887679a64b157ce54b1c16
+Source: CRAN
+Version: 0.5.0
+Hash: 673660fd0b947477dab1044abc8b2c95
 Requires: BH, DBI, R6, Rcpp, assertthat, lazyeval, magrittr, tibble
-GithubRepo: dplyr
-GithubUsername: hadley
-GithubRef: master
-GithubSha1: 6153e136fa9397e88478fa6270d9d1f02eb5153e
 
 Package: evaluate
 Source: CRAN
