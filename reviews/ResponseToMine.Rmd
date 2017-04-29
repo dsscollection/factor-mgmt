@@ -30,7 +30,6 @@ OUR RESPONSE: We've added a list of a few packages.
 
 OUR RESPONSE: Each section should now use the same variable for easier comparisons. 
 
-
 > The defensive coding section could benefit from a discussion on why both assertthat and testthat packages are useful. Is there functionality in one package that is not in the other? If so, the examples should reflect this. If not, and both are showcased just to provide alternatives, it would be a good idea to mention this. Also, I believe the assertions are often used within functions, but the example given here is not within a function. Why would someone not just use "length(levels(drinkstat))==3", which would give TRUE/FALSE, but instead put this within the assert_that function? It would be useful to spell out the reason for the reader.
 
 OUR RESPONSE: We have added a discussion of the two packages and mention of the reason why we use them in this code example.
@@ -198,11 +197,9 @@ OUR RESPONSE: We added spaces around all double equals in the paper.
 
 OUR RESPONSE: We've changed 'this can't be NA' to 'can't put NA in place of "missing"' Is it possible to set things to missing in `case_when()`? We don't see a way to do that. When we try, we get the error message `RHS of case 5 (NA): must be type character, not logical`. (Perhaps this is something to raise with Hadley.)
 
-> - `tally` is a mosaic function, not dplyr. Since this section is the dplyr section I think it would be more appropriate to use something like HELPsmall %>% count(drink_stat)
+> -tally is a mosaic function, not dplyr. Since this section is the dplyr section I think it would be more appropriate to use something like HELPsmall %>% count(drink_stat)
 
 OUR RESPONSE: We made this change.
-	
-
 	
 > Line 222: What do you mean by "harder to miss possible edge cases"?
 
