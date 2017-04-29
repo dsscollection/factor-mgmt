@@ -456,9 +456,11 @@ While assertions of this sort are most commonly used to provide error-checking w
 
 \section*{Conclusion}
 
-Categorical variables arise commonly in most datasets.  
-Aspects of data wrangling in R involving categorical variables can be problematic and error-prone.
-In this paper we have outlined some example case studies where analytic tasks can be simplified and made more robust through use of new tools available in the tidyverse. We believe further work is needed to continue to make it easier to undertake analyses requiring data wrangling (particularly with respect to categorical data). New tools and an increased emphasis on defensive coding may help improve the quality of data science moving forward.
+Categorical variables arise commonly in most datasets.  Aspects of data wrangling in \proglang{R} involving categorical variables can be problematic and error-prone, particularly when using \pkg{base} \proglang{R}. In this paper we have outlined some example case studies where analytic tasks can be simplified and made more robust through use of new tools available in the tidyverse. However, these are only some of the issues categorical data presents. 
+
+For example, many analysts use testing and training data when working with models, but without careful thought toward levels of categorical, there can be mismatch between the levels present in the training data and those present in the testing data. If a particular  level was not present in the training data, the model will not be able to make predictions for the observations in the testing data with that level. Even worse, if the two sets have the same number of levels, the model will produce predictions by matching the order of the levels rather than the labels. 
+
+We believe further work is needed to continue to make it easier to undertake analyses requiring data wrangling (particularly with respect to categorical data). New tools and an increased emphasis on defensive coding may help improve the quality of data science moving forward.
 
 \section*{Acknowledgements}
 

@@ -17,7 +17,7 @@ OUR RESPONSE: Thanks for the feedback!
 
 > I'd recommend spending a little time thinking a slightly more political term than "fragile"
 
-OUR RESPONSE: We have refined our introduction of "fragile" (on line XX) and introduced the idea of brittle software.
+OUR RESPONSE: We have refined our introduction of "fragile" and introduced the idea of brittle software.
 
 > I'm a bit worried this is over the page limit that we promised TAS (3-5 pages). We don't need to deal with this now but we will need to think about it for TAS.
 
@@ -31,7 +31,7 @@ factor("a", levels = "c")
 ```
 > Maybe worth a mention? (in "Compact but fragile")
 
-OUR RESPONSE: We've added this at the end of "Compact but fragile".
+OUR RESPONSE: We've added this into the initial problems with factors section.
      
 > Another gotcha is that if you have strings that with non-ASCII characters, the default of order levels may vary from locale to locale.
 
@@ -47,7 +47,7 @@ OUR RESPONSE: XX AM to address?
 
 > Would be nice to have link to paper in README and markdown version of paper for easy preview on GitHub. Should the paper be in the root directory?
 
-OUR RESPONSE: XX AM to address?
+OUR RESPONSE: Fixed
 
 ## Minor comments
 
@@ -62,7 +62,7 @@ OUR RESPONSE: We've made this change.
 
 > Maybe make GSS variable names a bit more concise? Would shorten up the code chunks
 
-OUR RESPONSE: XX AM to consider?
+OUR RESPONSE: Fixed
 
 > 6-130: some of the quotes are around the wrong way
 
