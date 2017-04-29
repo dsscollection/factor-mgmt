@@ -262,19 +262,7 @@ GSS <- GSS %>%
 summary(GSS$tidyOpinionOfIncome)
 @
 
-Notice the levels we did not mention end up at the back end of the ordering. Running the code again does not break things. 
-
-<<>>=
-GSS <- GSS %>%
-  mutate(tidyOpinionOfIncome = 
-           fct_relevel(tidyOpinionOfIncome, 
-                       "Far above average", 
-                       "Above average", 
-                       "Average", 
-                       "Below average", 
-                       "Far below average"))
-summary(GSS$tidyOpinionOfIncome)
-@
+Notice the levels we did not mention end up at the back end of the ordering. 
 
 \section*{Combining several levels into one}
 
