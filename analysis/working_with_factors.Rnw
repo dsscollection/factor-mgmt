@@ -1,36 +1,79 @@
-\documentclass[fleqn,10pt,lineno]{wlpeerj}
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{graphicx,psfrag,epsf}
+\usepackage{enumerate}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{url} % not crucial - just used below for the URL 
 
-\usepackage{url}
+%\pdfminorversion=4
+% NOTE: To produce blinded version, replace "0" with "1" below.
+\newcommand{\blind}{0}
+\overfullrule=1mm
+% DON'T change margins - should be 1 inch all around.
+\addtolength{\oddsidemargin}{-.5in}%
+\addtolength{\evensidemargin}{-.5in}%
+\addtolength{\textwidth}{1in}%
+\addtolength{\textheight}{1.3in}%
+\addtolength{\topmargin}{-.8in}%
 
 \let\proglang=\textsf
 \newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
 \def\newblock{\hskip .11em plus .33em minus .07em}
 
+\pdfminorversion=4
+\begin{document}
 
-\title{Wrangling categorical data in R}
+%\bibliographystyle{natbib}
 
-\author[1]{Amelia McNamara}
-\author[2]{Nicholas J Horton}
-\affil[1]{Program in Statistical and Data Sciences, Smith College}
-\affil[2]{Department of Mathematics and Statistics, Amherst College}
+\def\spacingset#1{\renewcommand{\baselinestretch}%
+{#1}\small\normalsize} \spacingset{1}
+\if0\blind
+{
+  \title{\bf Wrangling categorical data in R}
+  \author{Amelia McNamara \hspace{.2cm}\\
+    Program in Statistical and Data Sciences, Smith College\\
+    and \\
+    Nicholas J Horton \\
+    Department of Mathematics and Statistics, Amherst College}
+  \maketitle
+} \fi
 
+\if1\blind
+{
+  \bigskip
+  \bigskip
+  \bigskip
+  \begin{center}
+    {\LARGE\bf Title}
+\end{center}
+  \medskip
+} \fi
 
-\keywords{statistical computing; data derivation; data science; data management}
-
+\bigskip
 \begin{abstract}
 Data wrangling is a critical foundation of data science, and wrangling of categorical data is an important component of this process. However, categorical data can introduce unique issues in data wrangling, particularly in real-world settings with collaborators and periodically-updated dynamic data. This paper discusses common problems arising from categorical variable transformations in R, demonstrates the use of factors, and suggests approaches to address data wrangling challenges. For each problem, we present at least two strategies for management, one in base R and the other from the `tidyverse.' We consider several motivating examples, suggest defensive coding strategies, and outline principles for data wrangling to help ensure data quality and sound analysis.
 \end{abstract}
 
-\begin{document}
+\noindent%
+{\it Keywords:}  statistical computing; data derivation; data science; data management
+\vfill
+
+\newpage
+\spacingset{1.45} % DON'T change the spacing!
+
+
+
+
 
 <<setup, include=FALSE>>=
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, 
                       size='footnotesize', cache=FALSE, error=TRUE, tidy=FALSE)
 @
 
-\flushbottom
-\maketitle
-\thispagestyle{empty}
+% \flushbottom
+% \maketitle
+% \thispagestyle{empty}
 
 \section*{Introduction}
 
@@ -46,7 +89,8 @@ Our goal is to make the case that it is better to work with categorical data usi
 
 
 \section*{Categorical data in R: factors and strings}
-Consider a variable describing gender including categories \verb#male#, \verb#female# and \verb#non-conforming#. In \proglang{R}, there are two ways to store this information. One is to use a series of \emph{character strings}, and the other is to store it as a \emph{factor}. 
+Consider a variable describing gender including categories \verb#male#, \verb#female# and \\
+\verb#non-conforming#. In \proglang{R}, there are two ways to store this information. One is to use a series of \emph{character strings}, and the other is to store it as a \emph{factor}. 
 
 In early versions of \proglang{R}, storing categorical data as a factor variable was considerably more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015, Lum2015}. However, \proglang{R} now uses a global string pool, so each unique string is only stored once, which means storage is now less of an issue~\citep{Pen2015}. For historical (or possibly anachronistic) reasons, many functions store variables by default as factors.
 
@@ -177,7 +221,7 @@ GSS <- GSS %>%
            `Working parttime ` =  "Working part time"))
 summary(GSS$tidyLaborStatus)
 @
-In the above example, notice the trailing space in \verb#`Working parttime `# in the \verb#recode()# call. Because of this typo (the original factor level is actually \verb#`Working parttime`#), the original factor level persists after the recode. 
+In the above example, notice the trailing space in \\ \verb#`Working parttime `# in the \verb#recode()# call. Because of this typo (the original factor level is actually \verb#`Working parttime`#), the original factor level persists after the recode. 
 
 \subsection*{Aside -- Editing whitespace out of levels}
 
@@ -342,7 +386,7 @@ GSS <- GSS %>%
 summary(GSS$tidyAge)
 @
 
-Note that this approach requires the analyst to be very sure the strings including a number have a \emph{relevant} number. If one of the levels was labeled \verb#2 or more people in household# it would be converted to the number 2. This would accidentally add a number that was not meaningful. 
+Note that this approach requires the analyst to be very sure the strings including a number have a \emph{relevant} number. If one of the levels was labeled \\ \verb#2 or more people in household# it would be converted to the number 2. This would accidentally add a number that was not meaningful. 
 
 \section*{Creating derived categorical variables}
 Challenges often arise when data scientists need to create derived categorical variables. As an example, consider an indicator of moderate drinking status. The National Institutes of Alcohol Abuse and Alcoholism have published guidelines for moderate drinking~\citep{rethinkdrink}. These guidelines state that women (or men aged 65 or older) should drink no more than one drink per day on average and no more than three drinks on any single day or at a sitting. Men under age 65 should drink no more than two drinks per day on average and no more than four drinks on any single day.
@@ -548,7 +592,7 @@ value&description \\ \hline
 \end{tabular}
 
 
-Create a new variable called \verb#primsub# combining the primary and secondary substances into a categorical variable with values corresponding to primary and secondary substances of the form: {\tt alcohol only}, {\tt cocaine only}, {\tt heroin only}, {\tt alcohol-cocaine}, {\tt cocaine-alcohol}, or {\tt other}.  Code any group with fewer than 5 entries as {\tt alcohol-other}, {\tt cocaine-other}, or {\tt heroin-other}.  If \verb#PRIM\_SUB == 6# make the \verb#primsub# variable missing.
+Create a new variable called \verb#primsub# combining the primary and secondary substances into a categorical variable with values corresponding to primary and secondary substances of the form: {\tt alcohol only}, \\ {\tt cocaine only}, {\tt heroin only}, \\{\tt alcohol-cocaine}, {\tt cocaine-alcohol}, or {\tt other}.  Code any group with fewer than 5 entries as {\tt alcohol-other}, {\tt cocaine-other}, or {\tt heroin-other}.  If \verb#PRIM\_SUB == 6# make the \verb#primsub# variable missing.
 
 
 How many subjects are there in the {\tt alcohol-none} group?  How many subjects are there in the {\tt alcohol-other} group?  What are the three most common groups?
@@ -609,7 +653,7 @@ tally(~ title == "alcohol-none", data=merged)
 tally(~ title == "alcohol-other", data=merged)
 sort(tally(~ title, data=merged), decreasing=TRUE)[1:3]
 @
-
+\bibliographystyle{plainnat}
 \bibliography{bibliography.bib}
 
 \end{document}
