@@ -83,7 +83,7 @@ Statistical and data science tools need to foster good practice and provide a ro
 
 For example, data ingested into \proglang{R} from spreadsheets can lead to problems with categorical data because of the different storage methods possible in both \proglang{R} and the spreadsheets themselves~\citep{WilBry2016}. The examples below  help flag when these issues arise or avoid them altogether. 
 
-To ground our work, we compare and contrast how categorical data are treated in \pkg{base} \proglang{R} and the tidyverse~\citep{Wic2014, Wic2016b}. Tools from the tidyverse, discussed in another paper in this special issue (see https://github.com/dsscollection/tidyflow), are designed to make analysis purer, more predictable, and pipeable. Key components of the tidyverse we address in this paper include \pkg{dplyr}, \pkg{tidyr}, \pkg{forcats}, and \pkg{readr}. This suite of packages helps facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015, LowBes2017}. While \proglang{R} code written in \pkg{base} syntax can also have this quality, a common tendency is to use row or column numbers in code, which makes the result less reproducible. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).  
+To ground our work, we compare and contrast how categorical data are treated in \pkg{base} \proglang{R} and the tidyverse~\citep{Wic2014, Wic2016b}. Tools from the tidyverse~\citep{RosWic2017}, are designed to make analysis purer, more predictable, and pipeable. Key components of the tidyverse we address in this paper include \pkg{dplyr}, \pkg{tidyr}, \pkg{forcats}, and \pkg{readr}. This suite of packages helps facilitate a reproducible workflow where a new version of the data could be supplied in the code with updated results produced~\citep{Bro2015, LowBes2017}. While \proglang{R} code written in \pkg{base} syntax can also have this quality, a common tendency is to use row or column numbers in code, which makes the result less reproducible. Wrangling of categorical data can make this task even more complex (e.g., if a new level of a categorical variable is added in an updated dataset or inadvertently introduced by a careless error in a spreadsheet to be ingested into \proglang{R}).  
 
 Our goal is to make the case that it is better to work with categorical data using tidyverse packages than with \pkg{base} \proglang{R}. Tidyverse code is more human readable, which can help reduce errors from the start, and the functions we highlight have been designed to make it harder to accidentally remove relationships implicit in categorical data. Because these issues are even more salient for new users, we recommend that instructors teach tidyverse approaches from the start. 
 
@@ -183,7 +183,7 @@ We call this a \emph{fragile} process since future datasets may cause a workflow
 
 The issue of alphabetic ordering becomes even more relevant when considering strings that include non-ASCII characters, where the default order levels may vary from locale to locale. This means that code could create different results based on where it was run.
 
-The workflow will also fail if additional factor levels are added after the fact. In our experience, both with students and scientific collaborators, spreadsheet data can be easily changed in these ways. Others have noted this concern~\citep{Lee2016}. 
+The workflow will also fail if additional factor levels are added after the fact. In our experience, both with students and scientific collaborators, spreadsheet data can be easily changed in these ways. Others have noted this concern~\citep{Lee2016, BroWoo2017}. 
 
 \subsection*{Robust but verbose (base R)}
 Another (more robust method) to recode this variable in \pkg{base} \proglang{R} is to use subsetting to overwrite particular values in the data. 
@@ -517,7 +517,7 @@ source('../data/GSS.r')
 glimpse(GSS)
 @
 
-Obviously, the result is less than ideal. All of the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to use the Excel file and use the \pkg{readxl} package to load it. 
+Obviously, the result is less than ideal, lacking many of the qualities for sharing data for collaboaration~\citep{EllLee2017}. All of the factor variables are encoded as integers, but their level labels have been lost. We have to look at a codebook to determine if \verb#SEX == 1# indicates male or female. We would rather preserve the integrated level labels. In order to do this, our best option is to use the Excel file and use the \pkg{readxl} package to load it. 
 
 
 <<warning=FALSE>>=
