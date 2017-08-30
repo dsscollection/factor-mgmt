@@ -31,8 +31,8 @@
 \if0\blind
 {
   \title{\bf Wrangling categorical data in R}
-  \author{Amelia McNamara \hspace{.2cm}\\
-    Program in Statistical and Data Sciences, Smith College\\
+  \author{Amelia McNamara\footnote{Corresponding author email: \url{amcnamara@smith.edu}} \hspace{.2cm}\\
+    Program in Statistical and Data Sciences, Smith College\\ 
     and \\
     Nicholas J Horton \\
     Department of Mathematics and Statistics, Amherst College}
