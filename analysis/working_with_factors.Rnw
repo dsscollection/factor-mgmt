@@ -90,7 +90,7 @@ Our goal is to make the case that it is better to work with categorical data usi
 
 \section*{Categorical data in R: factors and strings}
 Consider a variable describing gender including categories \verb#male#, \verb#female# and \\
-\verb#non-conforming#. In \proglang{R}, there are two ways to store this information. One is to use a series of \emph{character strings}, and the other is to store it as a \emph{factor}. 
+\verb#non-binary#. In \proglang{R}, there are two ways to store this information. One is to use a series of \emph{character strings}, and the other is to store it as a \emph{factor}. 
 
 In early versions of \proglang{R}, storing categorical data as a factor variable was considerably more efficient than storing the same data as strings, because factor variables only store the factor labels once~\citep{Pen2015, Lum2015}. However, \proglang{R} now uses a global string pool, so each unique string is only stored once, which means storage is now less of an issue~\citep{Pen2015}. For historical (or possibly anachronistic) reasons, many functions store variables by default as factors.
 
