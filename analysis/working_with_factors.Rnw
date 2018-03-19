@@ -484,7 +484,11 @@ library(testthat)
 levels(GSS$Sex)
 expect_equivalent(levels(GSS$Sex), c("Female", "Male")) 
 @
-This check will only work if the levels are exactly the same as the strings provided, and are in the same order. Ideally, \verb#expect_equivalent()# would do level checking without relying on order, but that is not the current functionality. 
+This check will only work if the levels are exactly the same as the strings provided, and are in the same order. For level checking without relying on order, use \verb#expect_setequal()#. 
+
+<<>>=
+expect_setequal(levels(GSS$Sex), c("Male", "Female"))
+@
 
 While assertions of this sort are most commonly used to provide error-checking within functions, we believe that they can and should be incorporated into working code.  In this manner they may serve as the basis for a function at some point in the future.
 
