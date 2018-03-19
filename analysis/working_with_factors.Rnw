@@ -144,7 +144,7 @@ The remainder of this paper is organized around case studies (examples) to carry
 \begin{enumerate}
 \item Changing the labels of factor levels,
 \item Reordering factor levels,
-\item Combining several levels into one (both string-like labels and numeric, probably go together), and
+\item Combining several levels into one (both string-like labels and numeric), and
 \item Making derived factor variables.
 \end{enumerate}
 
