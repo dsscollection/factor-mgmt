@@ -296,7 +296,6 @@ Because of the fragility and potential for frustration and mistakes associated w
 
 The package \pkg{forcats} (where the name is an anagram of the word factors!) is included in the tidyverse~\citep{Wic2016}.  It includes a \verb#fct_relevel()# function that allows for robust reordering of factor levels. It takes a specification of the order of factor levels (either completely or partially) and is robust to re-running code in an interactive session. 
 <<>>=
-# devtools::install_github("hadley/forcats")
 library(forcats)
 summary(GSS$OpinionOfIncome)
 GSS <- GSS %>%
